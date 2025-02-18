@@ -1,0 +1,54 @@
+services:
+  mariadb:
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      SERVICE_NAME: mariadb
+    build: ./docker/mariadb/
+    container_name: mariadb
+    security_opt:
+      - seccomp:unconfined
+    volumes:
+      - mariadb_data:/var/lib/mysql:delegated
+    ports:
+      - "3308:3306"
+    networks:
+      - mariadb_network
+      - codeigniter_network
+
+  phpmyadmin:
+    build: ./docker/phpmyadmin
+    container_name: codeigniter_phpmyadmin
+    links:
+      - mariadb
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      UPLOAD_LIMIT: 512M
+    ports:
+      - 8383:80
+    networks:
+      - mariadb_network
+      - codeigniter_network
+
+  codeigniter:
+    build: ./docker/php
+    container_name: codeigniter
+    restart: always
+    ports:
+      - "8480:80"
+    volumes:
+      - ./poc:/var/www/html:delegated
+    networks:
+      - codeigniter_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+# Volumes
+volumes:
+  mariadb_data:
+
+# Networks
+networks:
+  mariadb_network:
+  codeigniter_network:
