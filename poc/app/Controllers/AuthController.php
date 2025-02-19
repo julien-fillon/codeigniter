@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Services\UserService;
 
-class Auth extends BaseController
+class AuthController extends BaseController
 {
 
     protected $userService;
@@ -17,6 +17,11 @@ class Auth extends BaseController
 
     public function login()
     {
+        // Check if the user is already connected
+        if (session()->get('isLoggedIn')) {
+            return redirect()->to('/dashboard');
+        }
+
         helper(['form']);
         return view('/auth/login');
     }

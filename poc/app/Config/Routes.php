@@ -5,7 +5,14 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
-$routes->get('/', 'Home::index');
-$routes->get('/login', 'Auth::login');
-$routes->post('/auth/loginSubmit', 'Auth::loginSubmit');
-$routes->get('/logout', 'Auth::logout');
+$routes->GET('/', 'HomeController::index');
+$routes->GET('/login', 'AuthController::login');
+$routes->POST('/auth/loginSubmit', 'AuthController::loginSubmit');
+$routes->GET('/logout', 'AuthController::logout');
+
+# Dashboard
+$routes->GET('/dashboard', 'DashboardController::index', ['filter' => 'authGuard']);
+
+# Dashboard Images
+$routes->GET('/dashboard/images', 'ImageController::index', ['filter' => 'authGuard']);
+$routes->POST('/dashboard/images', 'ImageController::upload', ['filter' => 'authGuard']);

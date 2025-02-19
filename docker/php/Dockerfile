@@ -16,6 +16,7 @@ RUN apk add --no-cache \
     apache2-ssl \
     apache2-http2 \
     curl \
+    imagemagick \
     php${PHP_VERSION} \
     php${PHP_VERSION}-apache2 \
     php${PHP_VERSION}-cli \
@@ -32,6 +33,7 @@ RUN apk add --no-cache \
     php${PHP_VERSION}-tokenizer \
     php${PHP_VERSION}-ctype \
     php${PHP_VERSION}-session \
+    php${PHP_VERSION}-pecl-imagick \
     # Xdebug
     php${PHP_VERSION}-pecl-xdebug \
     # For users permissions

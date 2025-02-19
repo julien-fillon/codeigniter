@@ -11,7 +11,7 @@
                         <h2>Connexion</h2>
                     </div>
                     <div class="card-body">
-                        <!-- Affichage des erreurs de validation -->
+                        <!-- Validation errors display -->
                         <?php if (isset($validation)): ?>
                             <div class="alert alert-danger">
                                 <?= $validation->listErrors() ?>
@@ -24,7 +24,7 @@
                             </div>
                         <?php endif; ?>
 
-                        <!-- Formulaire -->
+                        <!-- Form -->
                         <form action="<?= site_url('auth/loginSubmit') ?>" method="post">
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email :</label>
