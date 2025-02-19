@@ -23,8 +23,9 @@ class UserRepository
         try {
             return $this->userModel->where('email', $email)->first();
         } catch (Exception $e) {
-            log_message('error', 'Erreur UserRepository : ' . $e->getMessage());
-            return null;
+            $message = 'Error findUserByEmail in findUserByEmail : ' . $e->getMessage();
+            log_message('error', $message);
+            throw new \Exception($message);
         }
     }
 }

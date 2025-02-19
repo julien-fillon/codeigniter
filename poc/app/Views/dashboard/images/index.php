@@ -11,45 +11,30 @@
             Upload New Image
         </button>
 
-        <?php if (isset($error)): ?>
+        <?php if (session()->has('error')): ?>
             <div class="alert alert-danger">
-                <?= $error; ?>
+                <?= session('error'); ?>
             </div>
         <?php endif; ?>
 
-        <?php if (isset($success)): ?>
+        <?php if (session()->has('success')): ?>
             <div class="alert alert-success">
-                <?= $success; ?>
+                <?= session('success'); ?>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($images)) : ?>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Category</th>
-                        <th>Type</th>
-                        <th>Size (bytes)</th>
-                        <th>Dimensions</th>
-                        <th>Preview</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($images as $image): ?>
-                        <tr>
-                            <td><?= $image['id'] ?></td>
-                            <td><?= $image['name'] ?></td>
-                            <td><?= $image['category'] ?: '-' ?></td>
-                            <td><?= $image['type'] ?></td>
-                            <td><?= $image['size'] ?></td>
-                            <td><?= $image['width'] ?> x <?= $image['height'] ?></td>
-                            <td><img src="<?= $image['path'] ?>" width="100" alt="<?= $image['path'] ?>"></td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+
+            <?php foreach ($images as $image): ?>
+                <div class="col-md-3 mb-3">
+                    <div class="card">
+                        <img src="<?= base_url($image['path']) ?>" class="card-img-top" alt="<?= $image['name'] ?>">
+                        <div class="card-body text-center">
+                            <a href="/dashboard/images/delete/<?= $image['id'] ?>" class="btn btn-danger" onclick="return confirm('Voulez-vous vraiment supprimer cette image ?')">Supprimer</a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
         <?php else : ?>
             <p>No images found.</p>
         <?php endif; ?>

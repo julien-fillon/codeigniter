@@ -28,17 +28,22 @@ class AuthController extends BaseController
 
     public function loginSubmit()
     {
-        helper(['form']);
-        // If the validation is OK, check in the database
-        $email = $this->request->getPost('email');
-        $password = $this->request->getPost('password');
+        try {
+            helper(['form']);
+            // If the validation is OK, check in the database
+            $email = $this->request->getPost('email');
+            $password = $this->request->getPost('password');
 
-        if ($this->userService->login($email, $password)) {
-            return redirect()->to('/dashboard');
-        } else {
-            // In case of connection failure
+            if ($this->userService->login($email, $password)) {
+                return redirect()->to('/dashboard');
+            }
+
             return view('auth/login', [
-                'error' => 'Email ou mot de passe incorrect.',
+                'error' => 'Email or incorrect password.',
+            ]);
+        } catch (\Exception $e) {
+            return view('auth/login', [
+                'error' => 'An error occurred when login : ' . $e->getMessage(),
             ]);
         }
     }

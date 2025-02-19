@@ -24,8 +24,26 @@ class ImageRepository
         try {
             return $this->imageModel->findAll();
         } catch (Exception $e) {
-            log_message('error', 'Erreur ImageRepository : ' . $e->getMessage());
-            return null;
+            $message = 'Error findAllImages in ImageRepository : ' . $e->getMessage();
+            log_message('error', $message);
+            throw new \Exception($message);
+        }
+    }
+
+    /**
+     * Detail image
+     *
+     * @param  int $id
+     * @return array
+     */
+    public function findImageById(int $id): array|null
+    {
+        try {
+            return $this->imageModel->find($id);
+        } catch (Exception $e) {
+            $message = 'Error findById in ImageRepository : ' . $e->getMessage();
+            log_message('error', $message);
+            throw new \Exception($message);
         }
     }
 
@@ -52,10 +70,30 @@ class ImageRepository
                 'width'    => $width,
                 'height'   => $height,
                 'type'     => $type,
+                'created_at' => date('Y-m-d H:i:s'),
+                'updated_at' => date('Y-m-d H:i:s')
             ]);
         } catch (Exception $e) {
-            log_message('error', 'Erreur create image ImageRepository : ' . $e->getMessage());
-            return false;
+            $message = 'Error create image ImageRepository : ' . $e->getMessage();
+            log_message('error', $message);
+            throw new \Exception($message);
+        }
+    }
+
+    /**
+     * deleteImage
+     *
+     * @param  array $image
+     * @return bool
+     */
+    public function deleteImage(array $image): bool
+    {
+        try {
+            return $this->imageModel->delete($image['id']);
+        } catch (\Exception $e) {
+            $message = 'Error when deleting the image : ' . $e->getMessage();
+            log_message('error', $message);
+            throw new \Exception($message);
         }
     }
 }

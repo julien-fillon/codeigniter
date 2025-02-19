@@ -11,7 +11,7 @@ class ImageService
 {
     private const IMAGE_WIDTH = 200;
     private const IMAGE_HEIGHT = 200;
-    private const IMAGE_TYPE = '.webp';
+    private const IMAGE_TYPE = 'webp';
 
     protected $imageRepo;
 
@@ -45,7 +45,7 @@ class ImageService
             $targetDirectory = 'uploads/' . $dateFolder . '/';
 
             // Generation of a file name with extension ".webp"
-            $targetFileName = pathinfo($file->getRandomName(), PATHINFO_FILENAME) . self::IMAGE_TYPE;
+            $targetFileName = pathinfo($file->getRandomName(), PATHINFO_FILENAME) . '.' . self::IMAGE_TYPE;
             $fullDestPath = FCPATH . $targetDirectory . $targetFileName;
             $destPath = '/' . $targetDirectory . $targetFileName;
 
@@ -67,9 +67,38 @@ class ImageService
 
                 return $this->imageRepo->create($name, $category, $destPath, $size, self::IMAGE_WIDTH, self::IMAGE_HEIGHT, self::IMAGE_TYPE);
             } catch (ImageException | RuntimeException $e) {
-                log_message('error', 'File processing error: ' . $e->getMessage());
+                log_message('error', 'Error when uploading the image : ' . $e->getMessage());
                 $this->cleanupFiles([$tmpPath, $fullDestPath]);
+                throw new \Exception("Error when uploading the image :" . $e->getMessage());
             }
+        }
+
+        return false;
+    }
+
+    /**
+     * deleteImage
+     *
+     * @param  int $id
+     * @return bool
+     */
+    public function deleteImage(int $id): bool
+    {
+        try {
+            $image = $this->imageRepo->findImageById($id);
+
+            if ($image) {
+                // Delete the stored file
+                $filePath = WRITEPATH . 'uploads/' . $image['path'];
+                if (is_file($filePath)) {
+                    unlink($filePath);
+                }
+
+                // Delete information in the database
+                return $this->imageRepo->deleteImage($image);
+            }
+        } catch (\Exception $e) {
+            throw new \Exception("Error when deleting the image:" . $e->getMessage());
         }
 
         return false;

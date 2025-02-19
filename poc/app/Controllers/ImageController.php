@@ -28,15 +28,29 @@ class ImageController extends BaseController
             $name = $this->request->getPost('name');
             $category = $this->request->getPost('category');
 
-            if ($this->imageService->uploadImage($file, $name, $category)) {
-                return view('/dashboard/images/index', [
-                    'success' => 'Image uploaded successfully !',
-                ]);
+            try {
+                $message = $this->imageService->uploadImage($file, $name, $category)
+                    ? ['success', 'Image deleted successfully !']
+                    : ['error', 'The image does not exist !'];
+            } catch (\Exception $e) {
+                $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
             }
         }
 
-        return view('/dashboard/images/index', [
-            'error' => 'Failed to upload image.',
-        ]);
+        return redirect()->to('/dashboard/images')->with($message[0], $message[1]);
+    }
+
+    public function delete($id)
+    {
+
+        try {
+            $message = $this->imageService->deleteImage($id)
+                ? ['success', 'Image deleted successfully !']
+                : ['error', 'The image does not exist !'];
+        } catch (\Exception $e) {
+            $message = ['error', 'An error occurred when deleting the image : ' . $e->getMessage()];
+        }
+
+        return redirect()->to('/dashboard/images')->with($message[0], $message[1]);
     }
 }
