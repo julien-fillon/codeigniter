@@ -17,7 +17,7 @@ class ImageRepository
     /**
      * List images
      *
-     * @return array
+     * @return array<ImageModel>
      */
     public function findAllImages(): array|null
     {
@@ -34,9 +34,9 @@ class ImageRepository
      * Detail image
      *
      * @param  int $id
-     * @return array
+     * @return ImageModel
      */
-    public function findImageById(int $id): array|null
+    public function findImageById(int $id): ImageModel|null
     {
         try {
             return $this->imageModel->find($id);
@@ -83,13 +83,13 @@ class ImageRepository
     /**
      * deleteImage
      *
-     * @param  array $image
+     * @param  ImageModel $image
      * @return bool
      */
-    public function deleteImage(array $image): bool
+    public function deleteImage(ImageModel $image): bool
     {
         try {
-            return $this->imageModel->delete($image['id']);
+            return $this->imageModel->delete($image->id);
         } catch (\Exception $e) {
             $message = 'Error when deleting the image : ' . $e->getMessage();
             log_message('error', $message);

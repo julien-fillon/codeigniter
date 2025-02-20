@@ -25,7 +25,17 @@ class ImageService
      */
     public function getList(): array
     {
-        return $this->imageRepo->findAllImages();
+        $imageList = [];
+        $images = $this->imageRepo->findAllImages();
+        foreach ($images as $image) {
+            $imageList[] = [
+                'id' => $image->id,
+                'name' => $image->name,
+                'path' => $image->path
+            ];
+        }
+
+        return $imageList;
     }
 
     /**
@@ -89,7 +99,7 @@ class ImageService
 
             if ($image) {
                 // Delete the stored file
-                $filePath = WRITEPATH . 'uploads/' . $image['path'];
+                $filePath = WRITEPATH . 'uploads/' . $image->path;
                 if (is_file($filePath)) {
                     unlink($filePath);
                 }

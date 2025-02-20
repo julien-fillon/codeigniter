@@ -16,9 +16,9 @@ class UserRepository
 
     /**
      * @param string $email
-     * @return array|null
+     * @return UserModel|null
      */
-    public function findUserByEmail(string $email): array|null
+    public function findUserByEmail(string $email): UserModel|null
     {
         try {
             return $this->userModel->where('email', $email)->first();

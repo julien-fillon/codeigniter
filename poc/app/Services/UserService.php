@@ -22,8 +22,8 @@ class UserService
     {
         try {
             $user = $this->userRepo->findUserByEmail($email);
-            if ($user && password_verify($password, $user['password'])) {
-                session()->set(['isLoggedIn' => true, 'user_id' => $user['id'], 'user_name' => $user['name']]);
+            if ($user && password_verify($password, $user->password)) {
+                session()->set(['isLoggedIn' => true, 'user_id' => $user->id, 'user_name' => $user->name]);
                 return true;
             }
             return false;
