@@ -30,10 +30,7 @@
                     <div class="card">
                         <img src="<?= base_url($image['path']) ?>" class="card-img-top" alt="<?= $image['name'] ?>">
                         <div class="card-body text-center">
-                            <p>Name : <?= $image['name']; ?></p>
                             <p>Category : <?= $image['category']; ?></p>
-                        </div>
-                        <div class="card-body text-center">
                             <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?= $image['id'] ?>">
                                 Edit
                             </button>

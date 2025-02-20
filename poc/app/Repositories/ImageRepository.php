@@ -86,18 +86,20 @@ class ImageRepository
      * @param  ImageModel $image
      * @param  string $name
      * @param  string $category
+     * @param  string $path
      * @param  int $size
      * @param  int $width
      * @param  int $height
      * @param  string $type
      * @return bool
      */
-    public function update(ImageModel $image, string $name, string $category, int $size, int $width, int $height, string $type): bool
+    public function update(ImageModel $image, string $name, string $category, string $path, int $size, int $width, int $height, string $type): bool
     {
         try {
             return $this->imageModel->update($image->id, [
                 'name'     => $name,
                 'category' => $category,
+                'path'     => $path,
                 'size'     => $size,
                 'width'    => $width,
                 'height'   => $height,

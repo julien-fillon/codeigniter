@@ -114,12 +114,12 @@ class ImageService
 
         $size = $image->size;
         $destPath = $image->path;
-        $fullDestPath = FCPATH . $destPath;
+        $originalFullDestPath = FCPATH . $destPath;
 
         // Backup of the original file before modification
-        $backupPath = $fullDestPath . '.bak';
-        if (!copy($fullDestPath, $backupPath)) {
-            $message = 'Failed to create backup for ' . $fullDestPath;
+        $backupPath = $originalFullDestPath . '.bak';
+        if (!copy($originalFullDestPath, $backupPath)) {
+            $message = 'Failed to create backup for ' . $originalFullDestPath;
             log_message('error', $message);
             throw new \Exception($message);
         }
@@ -127,6 +127,16 @@ class ImageService
         try {
 
             if ($file && $file->isValid() && !$file->hasMoved()) {
+
+                // Generate a unique path with a date under-arborescence
+                $dateFolder = date('d-m-Y');
+                $targetDirectory = 'uploads/' . $dateFolder . '/';
+
+                // Generation of a file name with extension ".webp"
+                $targetFileName = pathinfo($file->getRandomName(), PATHINFO_FILENAME) . '.' . self::IMAGE_TYPE;
+                $fullDestPath = FCPATH . $targetDirectory . $targetFileName;
+                $destPath = '/' . $targetDirectory . $targetFileName;
+
                 $size = $file->getSize();
                 $tmpPath = $file->getTempName();
 
@@ -141,9 +151,9 @@ class ImageService
             }
 
             // Database update
-            $success = $this->imageRepo->update($image, $name, $category, $size, self::IMAGE_WIDTH, self::IMAGE_HEIGHT, self::IMAGE_TYPE);
+            $success = $this->imageRepo->update($image, $name, $category, $destPath, $size, self::IMAGE_WIDTH, self::IMAGE_HEIGHT, self::IMAGE_TYPE);
             if ($success) {
-                $this->cleanupFiles([$backupPath]);
+                $this->cleanupFiles([$backupPath, $originalFullDestPath]);
             }
 
             return $success;
@@ -152,11 +162,11 @@ class ImageService
             log_message('error', $message);
 
             if (file_exists($backupPath)) {
-                rename($backupPath, $fullDestPath); // Restoration of the original file
+                rename($backupPath, $originalFullDestPath); // Restoration of the original file
             }
 
             if (isset($tmpPath)) {
-                $this->cleanupFiles([$tmpPath]);
+                $this->cleanupFiles([$tmpPath, $fullDestPath]);
             }
 
             throw new \Exception($message);
