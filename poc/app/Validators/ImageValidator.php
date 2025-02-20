@@ -6,7 +6,7 @@ class ImageValidator
 {
 
     /**
-     * rules
+     *  Return the validation rules for an image.
      *
      * @param  boolean $isUpdate
      * @return array

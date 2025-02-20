@@ -4,6 +4,12 @@ namespace App\Validators;
 
 class AuthValidator
 {
+
+    /**
+     * Return the validation rules for login user.
+     *
+     * @return array
+     */
     public static function loginRules(): array
     {
         return [

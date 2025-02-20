@@ -2,12 +2,12 @@
 
 <?= $this->section('content') ?>
 
-<?= view('templates/header'); ?>
+<?= view('dashboard/templates/header'); ?>
 
 <main class="container my-4">
     <p>/index.php</p>
 </main>
 
-<?= view('templates/footer'); ?>
+<?= view('dashboard/templates/footer'); ?>
 
 <?= $this->endSection() ?>

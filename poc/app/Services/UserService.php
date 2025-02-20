@@ -14,11 +14,14 @@ class UserService
     }
 
     /**
+     * Connect an user
+     * 
      * @param string email
      * @param string password
      * @return boolean
+     * @throws \RuntimeException
      */
-    public function login(string $email, string $password)
+    public function login(string $email, string $password): bool
     {
         try {
             $user = $this->userRepo->findUserByEmail($email);
@@ -28,7 +31,7 @@ class UserService
             }
             return false;
         } catch (\Exception $e) {
-            throw new \Exception("Error when login user :" . $e->getMessage());
+            throw new \RuntimeException("Error when login user :" . $e->getMessage());
         }
     }
 }

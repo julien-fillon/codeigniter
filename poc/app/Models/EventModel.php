@@ -4,15 +4,25 @@ namespace App\Models;
 
 use CodeIgniter\Model;
 
-class ImageModel extends Model
+class EventModel extends Model
 {
-    protected $table            = 'images';
+    protected $table            = 'events';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'App\Models\ImageModel';
+    protected $returnType       = 'App\Models\EventModel';
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
-    protected $allowedFields    = ['category', 'name', 'path', 'size', 'width', 'height', 'type', 'created_at', 'updated_at'];
+    protected $allowedFields    = [
+        'event_name',
+        'organizer_name',
+        'organizer_surname',
+        'organizer_phone',
+        'organizer_email',
+        'slug',
+        'shorturl',
+        'social_links',
+        'qrcode',
+    ];
 
     protected bool $allowEmptyInserts = false;
     protected bool $updateOnlyChanged = true;
@@ -29,18 +39,12 @@ class ImageModel extends Model
 
     // Validation
     protected $validationRules      = [
-        'name' => [
-            'required',
-            'min_length[3]',
-            'max_length[255]',
-            'regex_match[/^[a-zA-Z0-9\s_-]+$/]'
-        ],
-        'category' => [
-            'required',
-            'min_length[3]',
-            'max_length[100]',
-            'regex_match[/^[a-zA-Z0-9\s_-]+$/]'
-        ]
+        'event_name'       => 'required|max_length[255]',
+        'organizer_name'   => 'required|max_length[100]',
+        'organizer_surname' => 'required|max_length[100]',
+        'organizer_phone'  => 'required|max_length[20]',
+        'organizer_email'  => 'required|valid_email|max_length[150]',
+        'social_links'     => 'permit_empty|valid_json',
     ];
     protected $validationMessages   = [];
     protected $skipValidation       = false;

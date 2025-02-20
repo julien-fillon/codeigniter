@@ -9,6 +9,9 @@ use App\Validators\ImageValidator;
 class ImageController extends BaseController
 {
 
+    /**
+     * @var ImageService $service Service body to manage business logic.
+     */
     protected $imageService;
     protected $redirect = '/dashboard/images';
 
@@ -17,6 +20,11 @@ class ImageController extends BaseController
         $this->imageService = new ImageService();
     }
 
+    /**
+     * Displays the login form
+     *
+     * @return string Render events in sight.
+     */
     public function index()
     {
         $data['images'] = $this->imageService->getList();
@@ -45,6 +53,12 @@ class ImageController extends BaseController
         return redirect()->to($this->redirect)->with($message[0], $message[1]);
     }
 
+    /**
+     * Updates an existing image.
+     *
+     * @param int $id Image Id.
+     * @return \CodeIgniter\HTTP\RedirectResponse
+     */
     public function update(int $id)
     {
         // true because it is an edition
@@ -67,6 +81,12 @@ class ImageController extends BaseController
         return redirect()->to($this->redirect)->with($message[0], $message[1]);
     }
 
+    /**
+     * Deletes an image by his ID.
+     *
+     * @param int $id Image ID
+     * @return \CodeIgniter\HTTP\RedirectResponse
+     */
     public function delete(int $id)
     {
 

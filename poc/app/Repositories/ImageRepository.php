@@ -3,10 +3,14 @@
 namespace App\Repositories;
 
 use App\Models\ImageModel;
+use CodeIgniter\Database\Exceptions\DatabaseException;
 use Exception;
 
 class ImageRepository
 {
+    /**
+     * @var ImageModel $imageModel Image model instance
+     */
     protected $imageModel;
 
     public function __construct()
@@ -17,38 +21,40 @@ class ImageRepository
     /**
      * List images
      *
-     * @return array<ImageModel>
+     * @return array<ImageModel> The list of images.
+     * @throws Exception
      */
-    public function findAllImages(): array|null
+    public function findAll(): array|null
     {
         try {
             return $this->imageModel->findAll();
         } catch (Exception $e) {
-            $message = 'Error findAllImages in ImageRepository : ' . $e->getMessage();
+            $message = 'Error fetching all images : ' . $e->getMessage();
             log_message('error', $message);
-            throw new \Exception($message);
+            throw new DatabaseException($message);
         }
     }
 
     /**
-     * Detail image
+     * Recovers an image by his ID.
      *
-     * @param  int $id
-     * @return ImageModel
+     * @param int $id
+     * @return ImageModel|null The image data, or null if not found.
+     * @throws Exception
      */
-    public function findImageById(int $id): ImageModel|null
+    public function findById(int $id): ImageModel|null
     {
         try {
             return $this->imageModel->find($id);
         } catch (Exception $e) {
-            $message = 'Error findById in ImageRepository : ' . $e->getMessage();
+            $message = 'Error fetching the image with ID ' . $id . ': ' . $e->getMessage();
             log_message('error', $message);
-            throw new \Exception($message);
+            throw new DatabaseException($message);
         }
     }
 
     /**
-     * Create image
+     * Create a new image.
      *
      * @param  string $name
      * @param  string $category
@@ -57,9 +63,10 @@ class ImageRepository
      * @param  int $width
      * @param  int $height
      * @param  string $type
-     * @return bool
+     * @return int|bool The ID of the image created or False in case of failure.
+     * @throws Exception
      */
-    public function create(string $name, string $category, string $path, int $size, int $width, int $height, string $type): bool
+    public function create(string $name, string $category, string $path, int $size, int $width, int $height, string $type): int|bool
     {
         try {
             return $this->imageModel->save([
@@ -74,14 +81,14 @@ class ImageRepository
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
         } catch (Exception $e) {
-            $message = 'Error create image ImageRepository : ' . $e->getMessage();
+            $message = 'Error creating the image : ' . $e->getMessage();
             log_message('error', $message);
-            throw new \Exception($message);
+            throw new DatabaseException($message);
         }
     }
 
     /**
-     * Update image
+     * Update an image
      *
      * @param  ImageModel $image
      * @param  string $name
@@ -92,6 +99,7 @@ class ImageRepository
      * @param  int $height
      * @param  string $type
      * @return bool
+     * @throws Exception
      */
     public function update(ImageModel $image, string $name, string $category, string $path, int $size, int $width, int $height, string $type): bool
     {
@@ -107,26 +115,27 @@ class ImageRepository
                 'updated_at' => date('Y-m-d H:i:s')
             ]);
         } catch (\Exception $e) {
-            $message = 'Error when updating the image : ' . $e->getMessage();
+            $message = 'Error updating the image with ID ' . $image->id . ': ' . $e->getMessage();
             log_message('error', $message);
-            throw new \Exception($message);
+            throw new DatabaseException($message);
         }
     }
 
     /**
-     * deleteImage
+     * Delete an image
      *
      * @param  ImageModel $image
      * @return bool
+     * @throws DatabaseException
      */
     public function delete(ImageModel $image): bool
     {
         try {
             return $this->imageModel->delete($image->id);
         } catch (\Exception $e) {
-            $message = 'Error when deleting the image : ' . $e->getMessage();
+            $message = 'Error deleting the image with ID ' . $image->id . ': ' . $e->getMessage();
             log_message('error', $message);
-            throw new \Exception($message);
+            throw new DatabaseException($message);
         }
     }
 }

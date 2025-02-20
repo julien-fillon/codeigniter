@@ -24,25 +24,34 @@ class ImageService
     }
 
     /**
-     * @return array
+     * Recovers the full list of images.
+     *
+     * @return array<ImageModel> The list of images.
+     * @throws \RuntimeException
      */
     public function getList(): array
     {
         $imageList = [];
-        $images = $this->imageRepo->findAllImages();
-        foreach ($images as $image) {
-            $imageList[] = [
-                'id' => $image->id,
-                'name' => $image->name,
-                'path' => $image->path,
-                'category' => $image->category
-            ];
+        try {
+            $images = $this->imageRepo->findAll();
+            foreach ($images as $image) {
+                $imageList[] = [
+                    'id' => $image->id,
+                    'name' => $image->name,
+                    'path' => $image->path,
+                    'category' => $image->category
+                ];
+            }
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Unable to retrieve events: ' . $e->getMessage());
         }
 
         return $imageList;
     }
 
     /**
+     * Upload a new image.
+     * 
      * @param UploadedFile $file
      * @param string $name
      * @param string $category
@@ -92,20 +101,19 @@ class ImageService
         return false;
     }
 
-
-
     /**
-     * updateImage
+     * Updates an existing image.
      *
      * @param  string $id
      * @param  UploadedFile $file
      * @param  string $name
      * @param  string $category
      * @return bool
+     * @throws \RuntimeException|\Exception
      */
     public function updateImage(string $id, UploadedFile $file, string $name, string $category): bool
     {
-        $image = $this->imageRepo->findImageById($id);
+        $image = $this->imageRepo->findById($id);
         if (!$image) {
             $message = 'Image not found';
             log_message('error', $message);
@@ -169,22 +177,23 @@ class ImageService
                 $this->cleanupFiles([$tmpPath, $fullDestPath]);
             }
 
-            throw new \Exception($message);
+            throw new \RuntimeException($message);
         }
     }
 
     /**
-     * deleteImage
+     * Deletes an image by his ID.
      *
      * @param  int $id
      * @return bool
+     * @throws \RuntimeException|\Exception
      */
     public function deleteImage(int $id): bool
     {
         $this->db->transStart();
 
         try {
-            $image = $this->imageRepo->findImageById($id);
+            $image = $this->imageRepo->findById($id);
 
             if (!$image) {
                 $message = 'Image not found';
@@ -218,7 +227,7 @@ class ImageService
                 file_put_contents($filePath, file_get_contents('php://input'));
             }
 
-            throw new \Exception($message);
+            throw new \RuntimeException($message);
         }
 
         return false;
@@ -227,7 +236,7 @@ class ImageService
     /**
      * Delete given files if they exist
      *
-     * @param  array $files
+     * @param  array<string> $files
      * @return void
      */
     private function cleanupFiles(array $files): void

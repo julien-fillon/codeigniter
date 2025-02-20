@@ -9,6 +9,9 @@ use App\Validators\AuthValidator;
 class AuthController extends BaseController
 {
 
+    /**
+     * @var UserService $service Service body to manage business logic.
+     */
     protected $userService;
 
     public function __construct()
@@ -16,6 +19,11 @@ class AuthController extends BaseController
         $this->userService = new UserService();
     }
 
+    /**
+     * Displays the login form
+     *
+     * @return string|\CodeIgniter\HTTP\RedirectResponse Render events in sight.
+     */
     public function login()
     {
         // Check if the user is already connected
@@ -27,6 +35,11 @@ class AuthController extends BaseController
         return view('/auth/login');
     }
 
+    /**
+     * Send login form data
+     *
+     * @return string|\CodeIgniter\HTTP\RedirectResponse Render events in sight.
+     */
     public function loginSubmit()
     {
         try {
@@ -51,6 +64,11 @@ class AuthController extends BaseController
         return view('auth/login', $message);
     }
 
+    /**
+     * Disconnects the user
+     *
+     * @return \CodeIgniter\HTTP\RedirectResponse
+     */
     public function logout()
     {
         // Destroy the session
