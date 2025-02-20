@@ -30,10 +30,18 @@
                     <div class="card">
                         <img src="<?= base_url($image['path']) ?>" class="card-img-top" alt="<?= $image['name'] ?>">
                         <div class="card-body text-center">
-                            <a href="/dashboard/images/delete/<?= $image['id'] ?>" class="btn btn-danger" onclick="return confirm('Voulez-vous vraiment supprimer cette image ?')">Supprimer</a>
+                            <p>Name : <?= $image['name']; ?></p>
+                            <p>Category : <?= $image['category']; ?></p>
+                        </div>
+                        <div class="card-body text-center">
+                            <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?= $image['id'] ?>">
+                                Edit
+                            </button>
+                            <a href="/dashboard/images/delete/<?= $image['id'] ?>" class="btn btn-danger" onclick="return confirm('Do you really want to delete this image?')">Delete</a>
                         </div>
                     </div>
                 </div>
+                <?= view('dashboard/images/modal/edit', ['image' => $image]); ?>
             <?php endforeach; ?>
         <?php else : ?>
             <p>No images found.</p>

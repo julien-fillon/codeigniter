@@ -10,6 +10,7 @@ class ImageController extends BaseController
 {
 
     protected $imageService;
+    protected $redirect = '/dashboard/images';
 
     public function __construct()
     {
@@ -24,47 +25,49 @@ class ImageController extends BaseController
 
     public function upload()
     {
-        if ($this->request->getMethod() === 'POST') {
 
-            if (!$this->validate(ImageValidator::rules())) {
-                return redirect()->back()->withInput()->with('error', implode(' ', $this->validator->getErrors()));
-            }
-
-            $file = $this->request->getFile('image');
-            $name = $this->request->getPost('name');
-            $category = $this->request->getPost('category');
-
-            try {
-                $message = $this->imageService->uploadImage($file, $name, $category)
-                    ? ['success', 'Image uploaded successfully !']
-                    : ['error', 'An error occurred when uploading the image !'];
-            } catch (\Exception $e) {
-                $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
-            }
+        if (!$this->validate(ImageValidator::rules())) {
+            return redirect()->back()->withInput()->with('error', implode(' ', $this->validator->getErrors()));
         }
 
-        return redirect()->to('/dashboard/images')->with($message[0], $message[1]);
-    }
-
-    /*public function update($id)
-    {
-        $validation = $this->validate([
-            'file_name' => 'required|min_length[3]|max_length[255]'
-        ]);
-
-        if (!$validation) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
-        }
+        $file = $this->request->getFile('image');
+        $name = $this->request->getPost('name');
+        $category = $this->request->getPost('category');
 
         try {
-            $message = $this->imageService->updateImage($id, ['file_name' => $this->request->getPost('file_name')]);
-            return redirect()->to('/image-library')->with('success', 'Image mise à jour avec succès');
+            $message = $this->imageService->uploadImage($file, $name, $category)
+                ? ['success', 'Image uploaded successfully !']
+                : ['error', 'An error occurred when uploading the image !'];
         } catch (\Exception $e) {
             $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
         }
-    }*/
 
-    public function delete($id)
+        return redirect()->to($this->redirect)->with($message[0], $message[1]);
+    }
+
+    public function update(int $id)
+    {
+        // true because it is an edition
+        if (!$this->validate(ImageValidator::rules(true))) {
+            return redirect()->back()->withInput()->with('error', implode(' ', $this->validator->getErrors()));
+        }
+
+        $file = $this->request->getFile('image');
+        $name = $this->request->getPost('name');
+        $category = $this->request->getPost('category');
+
+        try {
+            $message = $this->imageService->updateImage($id, $file, $name, $category)
+                ? ['success', 'Successful update image!']
+                : ['error', 'A problem occurred when updating the image !'];
+        } catch (\Exception $e) {
+            $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
+        }
+
+        return redirect()->to($this->redirect)->with($message[0], $message[1]);
+    }
+
+    public function delete(int $id)
     {
 
         try {
@@ -75,6 +78,6 @@ class ImageController extends BaseController
             $message = ['error', 'An error occurred when deleting the image : ' . $e->getMessage()];
         }
 
-        return redirect()->to('/dashboard/images')->with($message[0], $message[1]);
+        return redirect()->to($this->redirect)->with($message[0], $message[1]);
     }
 }

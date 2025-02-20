@@ -81,12 +81,43 @@ class ImageRepository
     }
 
     /**
+     * Update image
+     *
+     * @param  ImageModel $image
+     * @param  string $name
+     * @param  string $category
+     * @param  int $size
+     * @param  int $width
+     * @param  int $height
+     * @param  string $type
+     * @return bool
+     */
+    public function update(ImageModel $image, string $name, string $category, int $size, int $width, int $height, string $type): bool
+    {
+        try {
+            return $this->imageModel->update($image->id, [
+                'name'     => $name,
+                'category' => $category,
+                'size'     => $size,
+                'width'    => $width,
+                'height'   => $height,
+                'type'     => $type,
+                'updated_at' => date('Y-m-d H:i:s')
+            ]);
+        } catch (\Exception $e) {
+            $message = 'Error when updating the image : ' . $e->getMessage();
+            log_message('error', $message);
+            throw new \Exception($message);
+        }
+    }
+
+    /**
      * deleteImage
      *
      * @param  ImageModel $image
      * @return bool
      */
-    public function deleteImage(ImageModel $image): bool
+    public function delete(ImageModel $image): bool
     {
         try {
             return $this->imageModel->delete($image->id);

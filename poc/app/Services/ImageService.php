@@ -34,7 +34,8 @@ class ImageService
             $imageList[] = [
                 'id' => $image->id,
                 'name' => $image->name,
-                'path' => $image->path
+                'path' => $image->path,
+                'category' => $image->category
             ];
         }
 
@@ -64,8 +65,9 @@ class ImageService
 
             // Verification and creation of the directory if necessary
             if (!is_dir($targetDirectory) && !mkdir($targetDirectory, 0775, true) && !is_dir($targetDirectory)) {
-                log_message('error', 'Failed to create target directory: ' . $targetDirectory);
-                return false;
+                $message = 'Failed to create target directory: ' . $targetDirectory;
+                log_message('error', $message);
+                throw new \Exception($message);
             }
 
             try {
@@ -80,13 +82,85 @@ class ImageService
 
                 return $this->imageRepo->create($name, $category, $destPath, $size, self::IMAGE_WIDTH, self::IMAGE_HEIGHT, self::IMAGE_TYPE);
             } catch (ImageException | RuntimeException $e) {
-                log_message('error', 'Error when uploading the image : ' . $e->getMessage());
+                $message = 'Error when uploading the image : ' . $e->getMessage();
+                log_message('error', $message);
                 $this->cleanupFiles([$tmpPath, $fullDestPath]);
-                throw new \Exception("Error when uploading the image :" . $e->getMessage());
+                throw new \Exception($message);
             }
         }
 
         return false;
+    }
+
+
+
+    /**
+     * updateImage
+     *
+     * @param  string $id
+     * @param  UploadedFile $file
+     * @param  string $name
+     * @param  string $category
+     * @return bool
+     */
+    public function updateImage(string $id, UploadedFile $file, string $name, string $category): bool
+    {
+        $image = $this->imageRepo->findImageById($id);
+        if (!$image) {
+            $message = 'Image not found';
+            log_message('error', $message);
+            throw new \Exception($message);
+        }
+
+        $size = $image->size;
+        $destPath = $image->path;
+        $fullDestPath = FCPATH . $destPath;
+
+        // Backup of the original file before modification
+        $backupPath = $fullDestPath . '.bak';
+        if (!copy($fullDestPath, $backupPath)) {
+            $message = 'Failed to create backup for ' . $fullDestPath;
+            log_message('error', $message);
+            throw new \Exception($message);
+        }
+
+        try {
+
+            if ($file && $file->isValid() && !$file->hasMoved()) {
+                $size = $file->getSize();
+                $tmpPath = $file->getTempName();
+
+                $imageService = service('image');
+
+                $imageService->withFile($tmpPath)
+                    ->resize(self::IMAGE_WIDTH, self::IMAGE_HEIGHT, true, 'width')
+                    ->convert(IMAGETYPE_WEBP)
+                    ->save($fullDestPath);
+
+                $this->cleanupFiles([$tmpPath]);
+            }
+
+            // Database update
+            $success = $this->imageRepo->update($image, $name, $category, $size, self::IMAGE_WIDTH, self::IMAGE_HEIGHT, self::IMAGE_TYPE);
+            if ($success) {
+                $this->cleanupFiles([$backupPath]);
+            }
+
+            return $success;
+        } catch (\Exception $e) {
+            $message = 'Error when uploading the image : ' . $e->getMessage();
+            log_message('error', $message);
+
+            if (file_exists($backupPath)) {
+                rename($backupPath, $fullDestPath); // Restoration of the original file
+            }
+
+            if (isset($tmpPath)) {
+                $this->cleanupFiles([$tmpPath]);
+            }
+
+            throw new \Exception($message);
+        }
     }
 
     /**
@@ -102,30 +176,39 @@ class ImageService
         try {
             $image = $this->imageRepo->findImageById($id);
 
-            if ($image) {
-                // Delete the stored file
-                $filePath = FCPATH . $image->path;
-                // Suppression du fichier
-                if (file_exists($filePath) && !unlink($filePath)) {
-                    throw new \Exception("Erreur lors de la suppression du fichier");
-                }
-
-                // Delete information in the database
-                $this->imageRepo->deleteImage($image);
-
-                $this->db->transComplete(); // Valid the transaction
-
-                return true;
+            if (!$image) {
+                $message = 'Image not found';
+                log_message('error', $message);
+                throw new \Exception($message);
             }
+
+            // Delete the stored file
+            $filePath = FCPATH . $image->path;
+            // Delete file
+            if (file_exists($filePath) && !unlink($filePath)) {
+                $message = 'Error when deleting the file';
+                log_message('error', $message);
+                throw new \Exception($message);
+            }
+
+            // Delete information in the database
+            $this->imageRepo->delete($image);
+
+            $this->db->transComplete(); // Valid the transaction
+
+            return true;
         } catch (\Exception $e) {
             $this->db->transRollback(); // Cancels the transaction in the event of an error
+
+            $message = "Error when deleting the image:" . $e->getMessage();
+            log_message('error', $message);
 
             // If the file has been deleted but the BDD fails, it is restored
             if (!file_exists(FCPATH . $image->path)) {
                 file_put_contents($filePath, file_get_contents('php://input'));
             }
 
-            throw new \Exception("Error when deleting the image:" . $e->getMessage());
+            throw new \Exception($message);
         }
 
         return false;
