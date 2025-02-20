@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Repositories\ImageRepository;
 use CodeIgniter\HTTP\Files\UploadedFile;
 use CodeIgniter\Images\Exceptions\ImageException;
+use Config\Database;
 use RuntimeException;
 
 class ImageService
@@ -14,10 +15,12 @@ class ImageService
     private const IMAGE_TYPE = 'webp';
 
     protected $imageRepo;
+    protected $db;
 
     public function __construct()
     {
         $this->imageRepo = new ImageRepository();
+        $this->db = Database::connect();
     }
 
     /**
@@ -94,20 +97,34 @@ class ImageService
      */
     public function deleteImage(int $id): bool
     {
+        $this->db->transStart();
+
         try {
             $image = $this->imageRepo->findImageById($id);
 
             if ($image) {
                 // Delete the stored file
-                $filePath = WRITEPATH . 'uploads/' . $image->path;
-                if (is_file($filePath)) {
-                    unlink($filePath);
+                $filePath = FCPATH . $image->path;
+                // Suppression du fichier
+                if (file_exists($filePath) && !unlink($filePath)) {
+                    throw new \Exception("Erreur lors de la suppression du fichier");
                 }
 
                 // Delete information in the database
-                return $this->imageRepo->deleteImage($image);
+                $this->imageRepo->deleteImage($image);
+
+                $this->db->transComplete(); // Valid the transaction
+
+                return true;
             }
         } catch (\Exception $e) {
+            $this->db->transRollback(); // Cancels the transaction in the event of an error
+
+            // If the file has been deleted but the BDD fails, it is restored
+            if (!file_exists(FCPATH . $image->path)) {
+                file_put_contents($filePath, file_get_contents('php://input'));
+            }
+
             throw new \Exception("Error when deleting the image:" . $e->getMessage());
         }
 

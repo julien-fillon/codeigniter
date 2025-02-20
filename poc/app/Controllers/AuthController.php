@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Services\UserService;
+use App\Validators\AuthValidator;
 
 class AuthController extends BaseController
 {
@@ -30,22 +31,24 @@ class AuthController extends BaseController
     {
         try {
             helper(['form']);
-            // If the validation is OK, check in the database
+
+            $message = ['error' => 'Email or incorrect password.'];
+            // Validation via the external validator
+            if (!$this->validate(AuthValidator::loginRules())) {
+                return view('auth/login', $message);
+            }
+
             $email = $this->request->getPost('email');
             $password = $this->request->getPost('password');
 
             if ($this->userService->login($email, $password)) {
                 return redirect()->to('/dashboard');
             }
-
-            return view('auth/login', [
-                'error' => 'Email or incorrect password.',
-            ]);
         } catch (\Exception $e) {
-            return view('auth/login', [
-                'error' => 'An error occurred when login : ' . $e->getMessage(),
-            ]);
+            $message = ['error' => 'An error occurred when login : ' . $e->getMessage()];
         }
+
+        return view('auth/login', $message);
     }
 
     public function logout()
