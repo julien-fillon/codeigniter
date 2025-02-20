@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Services\ImageService;
 use App\Validators\ImageValidator;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class ImageController extends BaseController
 {
@@ -25,13 +26,18 @@ class ImageController extends BaseController
      *
      * @return string Render events in sight.
      */
-    public function index()
+    public function index(): string
     {
         $data['images'] = $this->imageService->getList();
         return view('dashboard/images/index', $data);
     }
 
-    public function upload()
+    /**
+     * Upload a new image.
+     *
+     * @return \CodeIgniter\HTTP\RedirectResponse
+     */
+    public function upload(): RedirectResponse
     {
 
         if (!$this->validate(ImageValidator::rules())) {
@@ -59,7 +65,7 @@ class ImageController extends BaseController
      * @param int $id Image Id.
      * @return \CodeIgniter\HTTP\RedirectResponse
      */
-    public function update(int $id)
+    public function update(int $id): RedirectResponse
     {
         // true because it is an edition
         if (!$this->validate(ImageValidator::rules(true))) {
@@ -87,7 +93,7 @@ class ImageController extends BaseController
      * @param int $id Image ID
      * @return \CodeIgniter\HTTP\RedirectResponse
      */
-    public function delete(int $id)
+    public function delete(int $id): RedirectResponse
     {
 
         try {

@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Services\UserService;
 use App\Validators\AuthValidator;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class AuthController extends BaseController
 {
@@ -24,7 +25,7 @@ class AuthController extends BaseController
      *
      * @return string|\CodeIgniter\HTTP\RedirectResponse Render events in sight.
      */
-    public function login()
+    public function login(): string|RedirectResponse
     {
         // Check if the user is already connected
         if (session()->get('isLoggedIn')) {
@@ -40,7 +41,7 @@ class AuthController extends BaseController
      *
      * @return string|\CodeIgniter\HTTP\RedirectResponse Render events in sight.
      */
-    public function loginSubmit()
+    public function loginSubmit(): string|RedirectResponse
     {
         try {
             helper(['form']);
@@ -69,7 +70,7 @@ class AuthController extends BaseController
      *
      * @return \CodeIgniter\HTTP\RedirectResponse
      */
-    public function logout()
+    public function logout(): RedirectResponse
     {
         // Destroy the session
         session()->destroy();

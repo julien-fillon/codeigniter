@@ -2,14 +2,16 @@
 
 namespace App\Controllers;
 
+use CodeIgniter\HTTP\RedirectResponse;
+
 class HomeController extends BaseController
 {
     /**
-     * Displays the login form
+     * Redirect to login page
      *
-     * @return string Render events in sight.
+     * @return \CodeIgniter\HTTP\RedirectResponse
      */
-    public function index()
+    public function index(): RedirectResponse
     {
         return redirect()->to('/login');
     }

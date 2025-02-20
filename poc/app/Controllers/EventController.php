@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Controllers\BaseController;
 use App\Services\EventService;
 use App\Validators\EventValidator;
+use CodeIgniter\HTTP\RedirectResponse;
 
 class EventController extends BaseController
 {
@@ -24,7 +25,7 @@ class EventController extends BaseController
      *
      * @return string Render events in sight.
      */
-    public function index()
+    public function index(): string
     {
         $data['events'] = $this->eventService->getList();
         return view('dashboard/events/index', $data);
@@ -35,7 +36,7 @@ class EventController extends BaseController
      *
      * @return string Render of the Vue.
      */
-    public function create()
+    public function create(): string
     {
         return view('dashboard/events/create');
     }
@@ -45,9 +46,46 @@ class EventController extends BaseController
      *
      * @return \CodeIgniter\HTTP\RedirectResponse
      */
-    public function store()
+    public function store(): RedirectResponse
     {
+        try {
+            if (!$this->validate(EventValidator::rules())) {
+                return redirect()->back()->withInput()->with('error', implode(' ', $this->validator->getErrors()));
+            }
 
+            $data = $this->request->getPost();
+            $this->eventService->createEvent($data);
+
+            return redirect()->to('dashboard/events')->with('success', 'Event created successfully!');
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Displays the publishing form for an event.
+     *
+     * @param int $id The ID of the event.
+     * @return string Render of the Vue.
+     */
+    public function edit(int $id): string|RedirectResponse
+    {
+        try {
+            $data['event'] = $this->eventService->getEvent($id);
+            return view('dashboard/events/edit', $data);
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Updates an existing event.
+     *
+     * @param int $id The ID of the event.
+     * @return \CodeIgniter\HTTP\RedirectResponse
+     */
+    public function update(int $id): RedirectResponse
+    {
         try {
 
             if (!$this->validate(EventValidator::rules())) {
@@ -55,11 +93,27 @@ class EventController extends BaseController
             }
 
             $data = $this->request->getPost();
-            $this->eventService->createEvent($data);
+            $this->eventService->updateEvent($id, $data);
+
+            return redirect()->to('/dashboard/events')->with('success', 'Event updated successfully!');
         } catch (\RuntimeException $e) {
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
+    }
 
-        return redirect()->to('/events')->with('success', 'Event created successfully!');
+    /**
+     * Deletes an event by his ID.
+     *
+     * @param int $id The ID of the event.
+     * @return \CodeIgniter\HTTP\RedirectResponse
+     */
+    public function delete($id)
+    {
+        try {
+            $this->eventService->deleteEvent($id);
+            return redirect()->to('/dashboard/events')->with('success', 'Event deleted successfully!');
+        } catch (\RuntimeException $e) {
+            return redirect()->back()->with('error', $e->getMessage());
+        }
     }
 }

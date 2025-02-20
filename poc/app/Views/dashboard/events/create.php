@@ -8,6 +8,18 @@
     <div class="container mt-5">
         <h1 class="mb-4">Create New Event</h1>
 
+        <?php if (session()->has('error')): ?>
+            <div class="alert alert-danger">
+                <?= session('error'); ?>
+            </div>
+        <?php endif; ?>
+
+        <?php if (session()->has('success')): ?>
+            <div class="alert alert-success">
+                <?= session('success'); ?>
+            </div>
+        <?php endif; ?>
+
         <form action="/dashboard/events/store" method="post">
             <div class="mb-3">
                 <label for="event_name" class="form-label">Event Name:</label>
@@ -16,7 +28,7 @@
 
             <div class="mb-3">
                 <label for="slug" class="form-label">Slug :</label>
-                <input type="text" class="form-control" name="slug" id="slug" required>
+                <input type="text" class="form-control" name="slug" id="slug">
             </div>
 
             <div class="mb-3">
@@ -40,7 +52,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="social_links" class="form-label">Social Links (JSON format):</label>
+                <label for="social_links" class="form-label">Social Links :</label>
                 <textarea class="form-control" name="social_links" id="social_links" rows="3"></textarea>
             </div>
 
