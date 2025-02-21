@@ -75,7 +75,7 @@ class EventService
             }
 
             // Image associated with the event
-            $event->images = $this->eventRepo->findImagesByEventId($event);
+            $event->images = $this->eventRepo->findImagesByEvent($event);
 
             return $event->toArray();
         } catch (\Exception $e) {
@@ -190,7 +190,7 @@ class EventService
         // Associate images with the event
         $this->eventRepo->attachImages($event, $images);
 
-        return $this->eventRepo->findImagesByEventId($event);
+        return $this->eventRepo->findImagesByEvent($event);
     }
 
     /**

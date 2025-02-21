@@ -81,6 +81,7 @@ class EventController extends BaseController
     {
         try {
             $data['event'] = $this->eventService->getEvent($id);
+            $data['entity_type'] = ImageEntity::CATEGORY_EVENT;
             return view('dashboard/events/edit', $data);
         } catch (\RuntimeException $e) {
             return redirect()->back()->with('error', $e->getMessage());

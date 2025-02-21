@@ -102,13 +102,17 @@ class ImageRepository
      * Create a new image.
      *
      * @param  ImageEntity $image
-     * @return bool True in case of success, false if not.
+     * @return int The ID of the newly created image
      * @throws Exception
      */
-    public function create(ImageEntity $image): bool
+    public function create(ImageEntity $image): int
     {
         try {
-            return $this->imageModel->save($image);
+            if ($this->imageModel->save($image)) {
+                return $this->imageModel->getInsertID();
+            }
+
+            throw new DatabaseException('Failed to save the image into the database.');
         } catch (Exception $e) {
             $message = 'Error creating the image : ' . $e->getMessage();
             log_message('error', $message);

@@ -144,7 +144,7 @@ class EventRepository
      * @param EventEntity $event
      * @return array
      */
-    public function findImagesByEventId(EventEntity $event): array
+    public function findImagesByEvent(EventEntity $event): array
     {
         $db = db_connect();
         $builder = $db->table('event_images');
@@ -159,16 +159,16 @@ class EventRepository
     /**
      * Recovers all events related to an image.
      *
-     * @param int $imageId
+     * @param ImageEntity $image
      * @return array
      */
-    public function findEventsByImageId(int $imageId): array
+    public function findEventsByImageId(ImageEntity $image): array
     {
         $db = db_connect();
         $builder = $db->table('event_images');
         $builder->select('events.*');
         $builder->join('events', 'events.id = event_images.event_id');
-        $builder->where('event_images.image_id', $imageId);
+        $builder->where('event_images.image_id', $image->id);
 
         return $builder->get()->getResultArray();
     }

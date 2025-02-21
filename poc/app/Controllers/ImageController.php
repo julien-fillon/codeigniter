@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Controllers\BaseController;
+use App\Entities\ImageEntity;
 use App\Services\ImageService;
 use App\Validators\ImageValidator;
 use CodeIgniter\HTTP\RedirectResponse;
@@ -48,11 +49,18 @@ class ImageController extends BaseController
         $file = $this->request->getFile('image');
         $name = $this->request->getPost('name');
         $category = $this->request->getPost('category');
+        $entityId = $this->request->getPost('entity_id');
 
         try {
-            $message = $this->imageService->uploadImage($file, $name, $category)
-                ? ['success', 'Image uploaded successfully !']
-                : ['error', 'An error occurred when uploading the image !'];
+            $image = $this->imageService->uploadImage($file, $name, $category);
+            if ($image instanceof ImageEntity) {
+                $message = ['success', 'Image uploaded successfully !'];
+                if ($category === ImageEntity::CATEGORY_EVENT && isset($entityId) && $this->imageService->associateImageWithEntity($entityId, $category, $image)) {
+                    return redirect()->route('events.edit', [$entityId])->with($message[0], $message[1]);
+                }
+            } else {
+                $message = ['error', 'An error occurred when uploading the image !'];
+            }
         } catch (\Exception $e) {
             $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
         }

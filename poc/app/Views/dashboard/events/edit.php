@@ -20,8 +20,6 @@
             </div>
         <?php endif; ?>
 
-        <?= form_open(route_to('events.update', $event['id'])) ?>
-
         <!-- QRCODE display -->
         <div class="mb-3 row">
             <?php if (!empty($event['qrcode'])): ?>
@@ -52,10 +50,10 @@
                 Select Images
             </button>
 
-            <?= view('dashboard/images/modal/list'); ?>
+            <?= view('dashboard/images/modal/list', ['id' => $event['id'], 'entity_type' => $entity_type]); ?>
         </div>
 
-
+        <?= form_open(route_to('events.update', $event['id'])) ?>
         <!-- Event name -->
         <div class="mb-3">
             <?= form_label('Event Name:', 'event_name', ['class' => 'form-label']) ?>

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entities\ImageEntity;
+use App\Repositories\EventRepository;
 use App\Repositories\ImageRepository;
 use CodeIgniter\HTTP\Files\UploadedFile;
 use CodeIgniter\Images\Exceptions\ImageException;
@@ -15,12 +16,14 @@ class ImageService
     private const IMAGE_HEIGHT = 200;
     private const IMAGE_TYPE = 'webp';
 
+    protected $eventRepo;
     protected $imageRepo;
     protected $db;
 
     public function __construct()
     {
         $this->imageRepo = new ImageRepository();
+        $this->eventRepo = new EventRepository();
         $this->db = Database::connect();
     }
 
@@ -86,7 +89,7 @@ class ImageService
      * @return bool
      * @throws \RuntimeException|\Exception
      */
-    public function uploadImage(UploadedFile $file, string $name, string $category): bool
+    public function uploadImage(UploadedFile $file, string $name, string $category): bool|ImageEntity
     {
         if ($file && $file->isValid() && !$file->hasMoved()) {
             $size = $file->getSize();
@@ -130,7 +133,8 @@ class ImageService
                 $image->created_at = $date;
                 $image->updated_at = $date;
 
-                return $this->imageRepo->create($image);
+                $image->id = $this->imageRepo->create($image);
+                return $image;
             } catch (ImageException | RuntimeException $e) {
                 $message = 'Error when uploading the image : ' . $e->getMessage();
                 log_message('error', $message);
@@ -196,7 +200,7 @@ class ImageService
                     ->convert(IMAGETYPE_WEBP)
                     ->save($fullDestPath);
 
-                $this->cleanupFiles([$tmpPath]);
+                $this->cleanupFiles([$tmpPath, $originalFullDestPath]);
             }
 
             $image->name = $name;
@@ -211,7 +215,7 @@ class ImageService
             // Database update
             $success = $this->imageRepo->update($image);
             if ($success) {
-                $this->cleanupFiles([$backupPath, $originalFullDestPath]);
+                $this->cleanupFiles([$backupPath]);
             }
 
             return $success;
@@ -227,6 +231,61 @@ class ImageService
                 $this->cleanupFiles([$tmpPath, $fullDestPath]);
             }
 
+            throw new \RuntimeException($message);
+        }
+    }
+
+    /**
+     * Associate an image with an entity according to the category
+     *
+     * @param int $entityId ID of the entity (ex: event)
+     * @param string $category Category to which the image belongs
+     * @param ImageEntity $image The image entity to associate
+     * @return bool Indicates if the association was successfully carried out
+     * @throws Exception If the entity to which associating the image does not exist
+     */
+    public function associateImageWithEntity(int $entityId, string $category, ImageEntity $image): bool
+    {
+        if (empty($entityId)) {
+            log_message('error', 'entity_id ne peut pas être vide');
+            throw new \Exception('Entity ID cannot be empty');
+        }
+
+        try {
+            switch ($category) {
+                case ImageEntity::CATEGORY_EVENT:
+
+                    $event = $this->eventRepo->findById($entityId);
+
+                    if (!$event) {
+                        $message = sprintf('Événement non trouvé pour ID : %d', $entityId);
+                        log_message('error', $message);
+                        throw new \Exception($message);
+                    }
+
+                    // Recover the existing images associated with this event
+                    $images = $this->eventRepo->findImagesByEvent($event);
+
+                    // Create a list of image IDs, including the ID of the new image
+                    $imageIds = array_merge(array_column($images, 'id'), [$image->id]);
+
+                    // Recover complete image entities from their IDS
+                    $updatedImages = $this->imageRepo->findByIds($imageIds);
+
+                    // Attach the updated images to the event
+                    $this->eventRepo->attachImages($event, $updatedImages);
+                    break;
+
+                default:
+                    $message = sprintf('Catégorie inconnue : %s', $category);
+                    log_message('error', $message);
+                    throw new \Exception($message);
+            }
+
+            return true;
+        } catch (\Throwable $e) {
+            $message = sprintf('Error during the association of the image: %s', $e->getMessage());
+            log_message('error', $message);
             throw new \RuntimeException($message);
         }
     }

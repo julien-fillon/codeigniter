@@ -36,24 +36,29 @@
                     ]) ?>
                 </div>
 
-                <!-- Dropdown for the category -->
-                <div class="mb-3">
-                    <?= form_label('Category', 'category', ['class' => 'form-label']) ?>
-                    <?= form_dropdown(
-                        'category',
-                        [
-                            '' => 'Select a category',
-                            'event' => 'Event',
-                            'date' => 'Date'
-                        ],
-                        old('category'),
-                        [
-                            'id' => 'category',
-                            'class' => 'form-select',
-                            'required' => true
-                        ]
-                    ) ?>
-                </div>
+                <?php if (isset($entity_type) && isset($id)) : ?>
+                    <?= form_hidden('category', $entity_type) ?>
+                    <?= form_hidden('entity_id', $id) ?>
+                <?php else : ?>
+                    <!-- Dropdown for the category -->
+                    <div class="mb-3">
+                        <?= form_label('Category', 'category', ['class' => 'form-label']) ?>
+                        <?= form_dropdown(
+                            'category',
+                            [
+                                '' => 'Select a category',
+                                'event' => 'Event',
+                                'date' => 'Date'
+                            ],
+                            old('category'),
+                            [
+                                'id' => 'category',
+                                'class' => 'form-select',
+                                'required' => true
+                            ]
+                        ) ?>
+                    </div>
+                <?php endif; ?>
             </div>
 
             <div class="modal-footer">
