@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Entities\ImageEntity;
 use App\Models\ImageModel;
 use CodeIgniter\Database\Exceptions\DatabaseException;
 use Exception;
@@ -21,7 +22,7 @@ class ImageRepository
     /**
      * List images
      *
-     * @return array<ImageModel> The list of images.
+     * @return array<ImageEntity>|null The list of images.
      * @throws Exception
      */
     public function findAll(): array|null
@@ -39,10 +40,10 @@ class ImageRepository
      * Recovers an image by his ID.
      *
      * @param int $id
-     * @return ImageModel|null The image data, or null if not found.
+     * @return ImageEntity|null The image data, or null if not found.
      * @throws Exception
      */
-    public function findById(int $id): ImageModel|null
+    public function findById(int $id): ImageEntity|null
     {
         try {
             return $this->imageModel->find($id);
@@ -56,30 +57,14 @@ class ImageRepository
     /**
      * Create a new image.
      *
-     * @param  string $name
-     * @param  string $category
-     * @param  string $path
-     * @param  int $size
-     * @param  int $width
-     * @param  int $height
-     * @param  string $type
-     * @return int|bool The ID of the image created or False in case of failure.
+     * @param  ImageEntity $image
+     * @return bool True in case of success, false if not.
      * @throws Exception
      */
-    public function create(string $name, string $category, string $path, int $size, int $width, int $height, string $type): int|bool
+    public function create(ImageEntity $image): bool
     {
         try {
-            return $this->imageModel->save([
-                'name'     => $name,
-                'category' => $category,
-                'path'     => $path,
-                'size'     => $size,
-                'width'    => $width,
-                'height'   => $height,
-                'type'     => $type,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
+            return $this->imageModel->save($image);
         } catch (Exception $e) {
             $message = 'Error creating the image : ' . $e->getMessage();
             log_message('error', $message);
@@ -90,30 +75,14 @@ class ImageRepository
     /**
      * Update an image
      *
-     * @param  ImageModel $image
-     * @param  string $name
-     * @param  string $category
-     * @param  string $path
-     * @param  int $size
-     * @param  int $width
-     * @param  int $height
-     * @param  string $type
-     * @return bool
+     * @param  ImageEntity $image
+     * @return bool True in case of success, false if not.
      * @throws Exception
      */
-    public function update(ImageModel $image, string $name, string $category, string $path, int $size, int $width, int $height, string $type): bool
+    public function update(ImageEntity $image): bool
     {
         try {
-            return $this->imageModel->update($image->id, [
-                'name'     => $name,
-                'category' => $category,
-                'path'     => $path,
-                'size'     => $size,
-                'width'    => $width,
-                'height'   => $height,
-                'type'     => $type,
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
+            return $this->imageModel->save($image);
         } catch (\Exception $e) {
             $message = 'Error updating the image with ID ' . $image->id . ': ' . $e->getMessage();
             log_message('error', $message);
@@ -124,11 +93,11 @@ class ImageRepository
     /**
      * Delete an image
      *
-     * @param  ImageModel $image
+     * @param  ImageEntity $image
      * @return bool
      * @throws DatabaseException
      */
-    public function delete(ImageModel $image): bool
+    public function delete(ImageEntity $image): bool
     {
         try {
             return $this->imageModel->delete($image->id);

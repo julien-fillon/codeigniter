@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Entities\EventEntity;
 use App\Models\EventModel;
 use CodeIgniter\Database\Exceptions\DatabaseException;
 use Exception;
@@ -21,7 +22,7 @@ class EventRepository
     /**
      * List events
      *
-     * @return array<EventModel> The list of events.
+     * @return array<EventEntity>|null The list of events.
      * @throws Exception
      */
     public function findAll(): array|null
@@ -39,10 +40,10 @@ class EventRepository
      * Recovers an event by his ID.
      *
      * @param int $id
-     * @return EventModel|null The event data, or null if not found.
+     * @return EventEntity|null The event data, or null if not found.
      * @throws Exception
      */
-    public function findById(int $id): EventModel|null
+    public function findById(int $id): EventEntity|null
     {
         try {
             return $this->eventModel->find($id);
@@ -56,14 +57,14 @@ class EventRepository
     /**
      * Creates a new event.
      *
-     * @param array $data Event data.
-     * @return int|bool The ID of the event created or False in case of failure.
+     * @param EventEntity $event
+     * @return bool True in case of success, false if not.
      * @throws Exception
      */
-    public function create(array $data): int|bool
+    public function create(EventEntity $event): bool
     {
         try {
-            return $this->eventModel->insert($data);
+            return $this->eventModel->save($event);
         } catch (\Exception $e) {
             $message = 'Error creating the event: ' . $e->getMessage();
             log_message('error', $message);
@@ -74,15 +75,14 @@ class EventRepository
     /**
      * Updates an existing event.
      *
-     * @param EventModel $event
-     * @param array $data New data from the event.
+     * @param EventEntity $event
      * @return bool True in case of success, false if not.
      * @throws Exception
      */
-    public function update(EventModel $event, array $data): bool
+    public function update(EventEntity $event): bool
     {
         try {
-            return $this->eventModel->update($event->id, $data);
+            return $this->eventModel->save($event);
         } catch (\Exception $e) {
             $message = 'Error updating the event with ID ' . $event->id . ': ' . $e->getMessage();
             log_message('error', $message);
@@ -93,11 +93,11 @@ class EventRepository
     /**
      * Deletes an event
      *
-     * @param EventModel $event
+     * @param EventEntity $event
      * @return bool True in case of success, false if not.
      * @throws Exception
      */
-    public function delete(EventModel $event): bool
+    public function delete(EventEntity $event): bool
     {
         try {
             return $this->eventModel->delete($event->id);

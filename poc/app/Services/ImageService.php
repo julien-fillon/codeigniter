@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entities\ImageEntity;
 use App\Repositories\ImageRepository;
 use CodeIgniter\HTTP\Files\UploadedFile;
 use CodeIgniter\Images\Exceptions\ImageException;
@@ -26,7 +27,7 @@ class ImageService
     /**
      * Recovers the full list of images.
      *
-     * @return array<ImageModel> The list of images.
+     * @return array<ImageEntity> The list of images.
      * @throws \RuntimeException
      */
     public function getList(): array
@@ -89,7 +90,18 @@ class ImageService
 
                 $this->cleanupFiles([$tmpPath]);
 
-                return $this->imageRepo->create($name, $category, $destPath, $size, self::IMAGE_WIDTH, self::IMAGE_HEIGHT, self::IMAGE_TYPE);
+                $image = new ImageEntity();
+                $image->name = $name;
+                $image->category = $category;
+                $image->path = $destPath;
+                $image->size = $size;
+                $image->width = self::IMAGE_WIDTH;
+                $image->height = self::IMAGE_HEIGHT;
+                $image->type = self::IMAGE_TYPE;
+                $image->created_at = date('Y-m-d H:i:s');
+                $image->updated_at = date('Y-m-d H:i:s');
+
+                return $this->imageRepo->create($image);
             } catch (ImageException | RuntimeException $e) {
                 $message = 'Error when uploading the image : ' . $e->getMessage();
                 log_message('error', $message);
@@ -158,8 +170,17 @@ class ImageService
                 $this->cleanupFiles([$tmpPath]);
             }
 
+            $image->name = $name;
+            $image->category = $category;
+            $image->path = $destPath;
+            $image->size = $size;
+            $image->width = self::IMAGE_WIDTH;
+            $image->height = self::IMAGE_HEIGHT;
+            $image->type = self::IMAGE_TYPE;
+            $image->updated_at = date('Y-m-d H:i:s');
+
             // Database update
-            $success = $this->imageRepo->update($image, $name, $category, $destPath, $size, self::IMAGE_WIDTH, self::IMAGE_HEIGHT, self::IMAGE_TYPE);
+            $success = $this->imageRepo->update($image);
             if ($success) {
                 $this->cleanupFiles([$backupPath, $originalFullDestPath]);
             }

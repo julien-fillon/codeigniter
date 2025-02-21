@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Entities\UserEntity;
 use App\Models\UserModel;
 use CodeIgniter\Database\Exceptions\DatabaseException;
 use Exception;
@@ -22,10 +23,10 @@ class UserRepository
      * Recovers an user by his Email.
      *
      * @param int $id
-     * @return UserModel|null The user data, or null if not found.
+     * @return UserEntity|null The user data, or null if not found.
      * @throws Exception
      */
-    public function findUserByEmail(string $email): UserModel|null
+    public function findUserByEmail(string $email): UserEntity|null
     {
         try {
             return $this->userModel->where('email', $email)->first();

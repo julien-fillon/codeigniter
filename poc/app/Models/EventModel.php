@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Entities\EventEntity;
 use CodeIgniter\Model;
 
 class EventModel extends Model
@@ -9,7 +10,7 @@ class EventModel extends Model
     protected $table            = 'events';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'App\Models\EventModel';
+    protected $returnType       = EventEntity::class;
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = [
@@ -22,6 +23,8 @@ class EventModel extends Model
         'shorturl',
         'social_links',
         'qrcode',
+        'created_at',
+        'updated_at'
     ];
 
     protected bool $allowEmptyInserts = false;

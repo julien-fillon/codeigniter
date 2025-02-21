@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Entities\EventEntity;
 use App\Repositories\EventRepository;
 use Config\Database;
 use Transliterator;
@@ -21,7 +22,7 @@ class EventService
     /**
      * Recovers the full list of events.
      *
-     * @return array<EventModel> The list of events.
+     * @return array<EventEntity> The list of events.
      * @throws \RuntimeException
      */
     public function getList(): array
@@ -64,18 +65,7 @@ class EventService
                 throw new \Exception($message);
             }
 
-            return [
-                'id' => $event->id,
-                'event_name' => $event->event_name,
-                'organizer_name' => $event->organizer_name,
-                'organizer_surname' => $event->organizer_surname,
-                'organizer_phone' => $event->organizer_phone,
-                'organizer_email' => $event->organizer_email,
-                'slug' => $event->slug,
-                'shorturl' => $event->shorturl,
-                'social_links' => json_decode($event->social_links, true),
-                'qrcode' => $event->qrcode,
-            ];
+            return $event->toArray();
         } catch (\Exception $e) {
             $message = 'Unable to retrieve event with ID ' . $id . ': ' . $e->getMessage();
             log_message('error', $message);
@@ -108,7 +98,10 @@ class EventService
             $datas['created_at'] = $date;
             $datas['updated_at'] = $date;
 
-            return $this->eventRepo->create($datas);
+            $event = new EventEntity();
+            $event->fill($datas);
+
+            return $this->eventRepo->create($event);
         } catch (\Exception $e) {
             $message = 'Unable to create the event: ' . $e->getMessage();
             log_message('error', $message);
@@ -146,7 +139,9 @@ class EventService
             $datas['created_at'] = date('Y-m-d H:i:s');
             $datas['updated_at'] = date('Y-m-d H:i:s');
 
-            return $this->eventRepo->update($event, $datas);
+            $event->fill($datas);
+
+            return $this->eventRepo->update($event);
         } catch (\Exception $e) {
             $message = 'Unable to update event with ID ' . $id . ': ' . $e->getMessage();
             log_message('error', $message);

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Entities\ImageEntity;
 use CodeIgniter\Model;
 
 class ImageModel extends Model
@@ -9,7 +10,7 @@ class ImageModel extends Model
     protected $table            = 'images';
     protected $primaryKey       = 'id';
     protected $useAutoIncrement = true;
-    protected $returnType       = 'App\Models\ImageModel';
+    protected $returnType       = ImageEntity::class;
     protected $useSoftDeletes   = false;
     protected $protectFields    = true;
     protected $allowedFields    = ['category', 'name', 'path', 'size', 'width', 'height', 'type', 'created_at', 'updated_at'];
