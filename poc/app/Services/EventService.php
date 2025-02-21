@@ -300,9 +300,9 @@ class EventService
      *
      * @param  string $shortUrl
      * @param  string $slugName
-     * @return void
+     * @return string
      */
-    private function generateQRCode(string $shortUrl, string $slugName)
+    private function generateQRCode(string $shortUrl, string $slugName): string
     {
         $eventUrl = env('app.baseURL') . 'events/' . $shortUrl;
 
@@ -330,8 +330,6 @@ class EventService
 
         $targetFileName = 'qrcodes/' .  $slugName . '-' . $shortUrl . '.png';
         $outputFile = FCPATH . $targetFileName;
-
-
 
         // Save the QR code generated
         $result->saveToFile($outputFile);
