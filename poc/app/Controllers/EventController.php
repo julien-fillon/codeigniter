@@ -6,6 +6,7 @@ use App\Controllers\BaseController;
 use App\Services\EventService;
 use App\Services\ImageService;
 use App\Validators\EventValidator;
+use App\Entities\ImageEntity;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 
@@ -140,7 +141,7 @@ class EventController extends BaseController
     {
         try {
             // Recover all the available images
-            $images = $this->imageService->getList();
+            $images = $this->imageService->getListCategory(ImageEntity::CATEGORY_EVENT);
 
             // Check if the event has associated images
             $event = $this->eventService->getEvent($eventId);

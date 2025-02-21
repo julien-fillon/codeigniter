@@ -37,6 +37,26 @@ class ImageRepository
     }
 
     /**
+     * List by category
+     *
+     * @param  string $category
+     * @return array<ImageEntity>|null The list of images.
+     * @throws Exception
+     */
+    public function findByCategory(string $category): array|null
+    {
+        try {
+            return $this->imageModel
+                ->where('category', $category)
+                ->findAll();
+        } catch (Exception $e) {
+            $message = 'Error fetching all images : ' . $e->getMessage();
+            log_message('error', $message);
+            throw new DatabaseException($message);
+        }
+    }
+
+    /**
      * Recovers an image by his ID.
      *
      * @param int $id

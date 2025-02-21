@@ -36,17 +36,23 @@
                     ]) ?>
                 </div>
 
-                <!-- Field for the category -->
+                <!-- Dropdown for the category -->
                 <div class="mb-3">
                     <?= form_label('Category', 'category', ['class' => 'form-label']) ?>
-                    <?= form_input([
-                        'type' => 'text',
-                        'name' => 'category',
-                        'id' => 'category',
-                        'class' => 'form-control',
-                        'value' => old('category'),
-                        'required' => true
-                    ]) ?>
+                    <?= form_dropdown(
+                        'category',
+                        [
+                            '' => 'Select a category',
+                            'event' => 'Event',
+                            'date' => 'Date'
+                        ],
+                        old('category'),
+                        [
+                            'id' => 'category',
+                            'class' => 'form-select',
+                            'required' => true
+                        ]
+                    ) ?>
                 </div>
             </div>
 

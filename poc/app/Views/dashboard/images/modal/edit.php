@@ -34,17 +34,23 @@
                     ]) ?>
                 </div>
 
-                <!-- Image category -->
+                <!-- Dropdown for the category -->
                 <div class="mb-3">
-                    <?= form_label('Category', 'category' . esc($image['id']), ['class' => 'form-label']) ?>
-                    <?= form_input([
-                        'type' => 'text',
-                        'name' => 'category',
-                        'id' => 'category' . esc($image['id']),
-                        'class' => 'form-control',
-                        'value' => old('category', $image['category']),
-                        'required' => true
-                    ]) ?>
+                    <?= form_label('Category', 'category', ['class' => 'form-label']) ?>
+                    <?= form_dropdown(
+                        'category',
+                        [
+                            '' => 'Select a category',
+                            'event' => 'Event',
+                            'date' => 'Date'
+                        ],
+                        old('category', $image['category']),
+                        [
+                            'id' => 'category',
+                            'class' => 'form-select',
+                            'required' => true
+                        ]
+                    ) ?>
                 </div>
             </div>
 

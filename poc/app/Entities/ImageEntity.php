@@ -7,6 +7,9 @@ use CodeIgniter\Entity\Entity;
 class ImageEntity extends Entity
 {
 
+    public const CATEGORY_EVENT = "event";
+    public const CATEGORY_DATE = "date";
+
     protected $attributes = [
         'id'         => null,
         'category' => null,

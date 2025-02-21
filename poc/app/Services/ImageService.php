@@ -51,6 +51,33 @@ class ImageService
     }
 
     /**
+     * Recovers the full list of images.
+     *
+     * @param  string $category
+     * @return array<ImageEntity> The list of images.
+     * @throws \RuntimeException
+     */
+    public function getListCategory(string $category): array
+    {
+        $imageList = [];
+        try {
+            $images = $this->imageRepo->findByCategory($category);
+            foreach ($images as $image) {
+                $imageList[] = [
+                    'id' => $image->id,
+                    'name' => $image->name,
+                    'path' => $image->path,
+                    'category' => $image->category
+                ];
+            }
+        } catch (\Exception $e) {
+            throw new \RuntimeException('Unable to retrieve events: ' . $e->getMessage());
+        }
+
+        return $imageList;
+    }
+
+    /**
      * Upload a new image.
      * 
      * @param UploadedFile $file
