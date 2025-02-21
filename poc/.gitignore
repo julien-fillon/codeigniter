@@ -127,4 +127,5 @@ nb-configuration.xml
 
 # images upload
 /public/uploads
+/public/qrcodes
 /public/pinfo.php

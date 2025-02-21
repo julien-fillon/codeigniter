@@ -34,6 +34,7 @@ RUN apk add --no-cache \
     php${PHP_VERSION}-ctype \
     php${PHP_VERSION}-session \
     php${PHP_VERSION}-pecl-imagick \
+    php${PHP_VERSION}-iconv \
     # Xdebug
     php${PHP_VERSION}-pecl-xdebug \
     # For users permissions

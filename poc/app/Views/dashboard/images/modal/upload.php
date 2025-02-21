@@ -3,30 +3,58 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uploadModalLabel">Upload Image</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="uploadModalLabel">Upload an image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
-            <form action="/dashboard/images" method="post" enctype="multipart/form-data">
-                <?= csrf_field() ?>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Choose Image</label>
-                        <input type="file" class="form-control" id="image" name="image" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name">
-                    </div>
-                    <div class="mb-3">
-                        <label for="category" class="form-label">Category</label>
-                        <input type="text" class="form-control" id="category" name="category">
-                    </div>
+
+            <!-- Upload form-->
+            <?= form_open_multipart(route_to('images.upload')) ?>
+            <div class="modal-body">
+
+                <!-- Selection of an image -->
+                <div class="mb-3">
+                    <?= form_label('Choose an image', 'image', ['class' => 'form-label']) ?>
+                    <?= form_upload([
+                        'name' => 'image',
+                        'id' => 'image',
+                        'class' => 'form-control',
+                        'accept' => 'image/*',
+                        'required' => true
+                    ]) ?>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Upload</button>
+
+                <!-- Field for name -->
+                <div class="mb-3">
+                    <?= form_label('Name', 'name', ['class' => 'form-label']) ?>
+                    <?= form_input([
+                        'type' => 'text',
+                        'name' => 'name',
+                        'id' => 'name',
+                        'class' => 'form-control',
+                        'value' => old('name'),
+                        'required' => true
+                    ]) ?>
                 </div>
-            </form>
+
+                <!-- Field for the category -->
+                <div class="mb-3">
+                    <?= form_label('Category', 'category', ['class' => 'form-label']) ?>
+                    <?= form_input([
+                        'type' => 'text',
+                        'name' => 'category',
+                        'id' => 'category',
+                        'class' => 'form-control',
+                        'value' => old('category'),
+                        'required' => true
+                    ]) ?>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+            <?= form_close() ?>
         </div>
     </div>
 </div>

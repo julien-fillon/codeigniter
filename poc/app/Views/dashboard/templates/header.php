@@ -1,7 +1,8 @@
 <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <a class="navbar-brand" href="/dashboard">Crystal Event</a>
+            <!-- Lien vers l'accueil du tableau de bord -->
+            <a class="navbar-brand" href="<?= route_to('dashboard.index') ?>">Crystal Event</a>
 
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -10,17 +11,21 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="/dashboard/images">Images</a>
+                        <!-- Lien vers la gestion des images -->
+                        <a class="nav-link" href="<?= route_to('images.index') ?>">Images</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/dashboard/pages">Pages</a>
+                        <!-- Lien vers la gestion des pages -->
+                        <a class="nav-link" href="<?= route_to('pages.index') ?>">Pages</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/dashboard/events">Events</a>
+                        <!-- Lien vers la gestion des événements -->
+                        <a class="nav-link" href="<?= route_to('event.index') ?>">Events</a>
                     </li>
                 </ul>
                 <div class="d-flex ms-3">
-                    <a href="/logout" class="btn btn-danger">Logout</a>
+                    <!-- Lien Déconnexion -->
+                    <a href="<?= route_to('auth.logout') ?>" class="btn btn-danger">Logout</a>
                 </div>
             </div>
         </div>

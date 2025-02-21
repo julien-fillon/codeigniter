@@ -18,6 +18,7 @@ class ImageController extends BaseController
 
     public function __construct()
     {
+        helper(['form', 'url']); // Load the necessary helpers
         $this->imageService = new ImageService();
     }
 

@@ -1,31 +1,58 @@
-<!-- Edition modal -->
-<div class="modal fade" id="editModal<?= $image['id'] ?>" tabindex="-1" aria-labelledby="editModalLabel<?= $image['id'] ?>" aria-hidden="true">
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal<?= esc($image['id']) ?>" tabindex="-1" aria-labelledby="editModalLabel<?= esc($image['id']) ?>" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel<?= $image['id'] ?>">Edit the image</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" id="editModalLabel<?= esc($image['id']) ?>">Modifier l'image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
-            <form action="/dashboard/images/update/<?= $image['id'] ?>" method="post" enctype="multipart/form-data">
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="image<?= $image['id'] ?>" class="form-label">New image (optional)</label>
-                        <input type="file" class="form-control" id="image<?= $image['id'] ?>" name="image">
-                    </div>
-                    <div class="mb-3">
-                        <label for="name<?= $image['id'] ?>" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name<?= $image['id'] ?>" name="name" value="<?= esc($image['name']) ?>" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="category<?= $image['id'] ?>" class="form-label">Category</label>
-                        <input type="text" class="form-control" id="category<?= $image['id'] ?>" name="category" value="<?= esc($image['category']) ?>" required>
-                    </div>
+
+            <!-- Form -->
+            <?= form_open_multipart(route_to('images.update', $image['id'])) ?>
+            <div class="modal-body">
+
+                <!-- Remote of a new image -->
+                <div class="mb-3">
+                    <?= form_label('New image (optional)', 'image' . esc($image['id']), ['class' => 'form-label']) ?>
+                    <?= form_upload([
+                        'name' => 'image',
+                        'id' => 'image' . esc($image['id']),
+                        'class' => 'form-control'
+                    ]) ?>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save</button>
+
+                <!-- Image name -->
+                <div class="mb-3">
+                    <?= form_label('Nom', 'name' . esc($image['id']), ['class' => 'form-label']) ?>
+                    <?= form_input([
+                        'type' => 'text',
+                        'name' => 'name',
+                        'id' => 'name' . esc($image['id']),
+                        'class' => 'form-control',
+                        'value' => old('name', $image['name']),
+                        'required' => true
+                    ]) ?>
                 </div>
-            </form>
+
+                <!-- Image category -->
+                <div class="mb-3">
+                    <?= form_label('Category', 'category' . esc($image['id']), ['class' => 'form-label']) ?>
+                    <?= form_input([
+                        'type' => 'text',
+                        'name' => 'category',
+                        'id' => 'category' . esc($image['id']),
+                        'class' => 'form-control',
+                        'value' => old('category', $image['category']),
+                        'required' => true
+                    ]) ?>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+            <?= form_close() ?>
         </div>
     </div>
 </div>

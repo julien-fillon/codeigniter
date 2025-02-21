@@ -2,7 +2,7 @@
 
 <?= $this->section('content') ?>
 
-<?= view('dashboard/templates/header'); ?>
+<?= view('dashboard/templates/header') ?>
 
 <main class="container my-4">
     <div class="container mt-5">
@@ -10,70 +10,124 @@
 
         <?php if (session()->has('error')): ?>
             <div class="alert alert-danger">
-                <?= session('error'); ?>
+                <?= session('error') ?>
             </div>
         <?php endif; ?>
 
         <?php if (session()->has('success')): ?>
             <div class="alert alert-success">
-                <?= session('success'); ?>
+                <?= session('success') ?>
             </div>
         <?php endif; ?>
 
-        <form action="/dashboard/events/update/<?= $event['id']; ?>" method="post">
+        <?= form_open(route_to('event.update', $event['id'])) ?>
 
-            <div class="mb-3">
-                <p>Shorturl : <?= $event['shorturl']; ?></p>
-            </div>
+        <!-- QRCODE display -->
+        <div class="mb-3 row">
+            <?php if (!empty($event['qrcode'])): ?>
+                <p class="col-8">Shorturl : <?= $event['qrcode'] ?></p>
+                <img src="<?= base_url($event['qrcode']) ?>" class="col-2" alt="<?= $event['qrcode'] ?>">
+            <?php endif; ?>
+        </div>
 
-            <div class="mb-3">
-                <label for="event_name" class="form-label">Event Name:</label>
-                <input type="text" class="form-control" name="event_name" id="event_name" value="<?= $event['event_name']; ?>" required>
-            </div>
+        <!-- Event name -->
+        <div class="mb-3">
+            <?= form_label('Event Name:', 'event_name', ['class' => 'form-label']) ?>
+            <?= form_input([
+                'name'  => 'event_name',
+                'id'    => 'event_name',
+                'class' => 'form-control',
+                'required' => true,
+                'value' => old('event_name', $event['event_name']),
+            ]) ?>
+        </div>
 
-            <div class="mb-3">
-                <label for="slug" class="form-label">Slug :</label>
-                <input type="text" class="form-control" name="slug" id="slug" value="<?= $event['slug']; ?>" required>
-            </div>
+        <!-- Slug -->
+        <div class="mb-3">
+            <?= form_label('Slug:', 'slug', ['class' => 'form-label']) ?>
+            <?= form_input([
+                'name'  => 'slug',
+                'id'    => 'slug',
+                'class' => 'form-control',
+                'required' => true,
+                'value' => old('slug', $event['slug']),
+            ]) ?>
+        </div>
 
-            <div class="mb-3">
-                <label for="organizer_name" class="form-label">Organizer Name:</label>
-                <input type="text" class="form-control" name="organizer_name" id="organizer_name" value="<?= $event['organizer_name']; ?>" required>
-            </div>
+        <!-- Organizing name -->
+        <div class="mb-3">
+            <?= form_label('Organizer Name:', 'organizer_name', ['class' => 'form-label']) ?>
+            <?= form_input([
+                'name'  => 'organizer_name',
+                'id'    => 'organizer_name',
+                'class' => 'form-control',
+                'required' => true,
+                'value' => old('organizer_name', $event['organizer_name']),
+            ]) ?>
+        </div>
 
-            <div class="mb-3">
-                <label for="organizer_surname" class="form-label">Organizer Surname:</label>
-                <input type="text" class="form-control" name="organizer_surname" id="organizer_surname" value="<?= $event['organizer_surname']; ?>" required>
-            </div>
+        <!-- Organizer's first name -->
+        <div class="mb-3">
+            <?= form_label('Organizer Surname:', 'organizer_surname', ['class' => 'form-label']) ?>
+            <?= form_input([
+                'name'  => 'organizer_surname',
+                'id'    => 'organizer_surname',
+                'class' => 'form-control',
+                'required' => true,
+                'value' => old('organizer_surname', $event['organizer_surname']),
+            ]) ?>
+        </div>
 
-            <div class="mb-3">
-                <label for="organizer_phone" class="form-label">Organizer Phone:</label>
-                <input type="text" class="form-control" name="organizer_phone" id="organizer_phone" value="<?= $event['organizer_phone']; ?>" required>
-            </div>
+        <!-- Organizer phone -->
+        <div class="mb-3">
+            <?= form_label('Organizer Phone:', 'organizer_phone', ['class' => 'form-label']) ?>
+            <?= form_input([
+                'name'  => 'organizer_phone',
+                'id'    => 'organizer_phone',
+                'class' => 'form-control',
+                'required' => true,
+                'value' => old('organizer_phone', $event['organizer_phone']),
+            ]) ?>
+        </div>
 
-            <div class="mb-3">
-                <label for="organizer_email" class="form-label">Organizer Email:</label>
-                <input type="email" class="form-control" name="organizer_email" id="organizer_email" value="<?= $event['organizer_email']; ?>" required>
-            </div>
+        <!-- Organizer email -->
+        <div class="mb-3">
+            <?= form_label('Organizer Email:', 'organizer_email', ['class' => 'form-label']) ?>
+            <?= form_input([
+                'type'  => 'email',
+                'name'  => 'organizer_email',
+                'id'    => 'organizer_email',
+                'class' => 'form-control',
+                'required' => true,
+                'value' => old('organizer_email', $event['organizer_email']),
+            ]) ?>
+        </div>
 
-            <div class="mb-3">
-                <label for="social_links" class="form-label">Social Links :</label>
-                <?php $list_social_links = '';
-                $i = 1; ?>
-                <?php if (isset($event['social_links'])) : ?>
-                    <?php foreach ($event['social_links'] as $social_link) : ?>
-                        <?php $list_social_links .= (count($event['social_links']) != $i) ? $social_link . ', ' : $social_link;
-                        $i++; ?>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-                <textarea class="form-control" name="social_links" id="social_links" rows="3"><?= $list_social_links; ?></textarea>
-            </div>
+        <!-- Social ties -->
+        <div class="mb-3">
+            <?= form_label('Social Links:', 'social_links', ['class' => 'form-label']) ?>
+            <?php
+            $list_social_links = '';
+            if (isset($event['social_links']) && is_array($event['social_links'])) {
+                $list_social_links = implode(', ', $event['social_links']);
+            }
+            ?>
+            <?= form_textarea([
+                'name'  => 'social_links',
+                'id'    => 'social_links',
+                'class' => 'form-control',
+                'rows'  => 3,
+                'value' => old('social_links', $list_social_links),
+            ]) ?>
+        </div>
 
-            <button type="submit" class="btn btn-primary">Save Changes</button>
-        </form>
+        <!-- Bouton de soumission -->
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+
+        <?= form_close() ?>
     </div>
 </main>
 
-<?= view('dashboard/templates/footer'); ?>
+<?= view('dashboard/templates/footer') ?>
 
 <?= $this->endSection() ?>
