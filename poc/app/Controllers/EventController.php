@@ -17,6 +17,7 @@ class EventController extends BaseController
 
     public function __construct()
     {
+        helper(['form', 'url']); // Load the necessary helpers
         $this->eventService = new EventService();
     }
 

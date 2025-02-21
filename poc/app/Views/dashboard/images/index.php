@@ -34,7 +34,7 @@
                                 <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#editModal<?= $image['id'] ?>">
                                     Edit
                                 </button>
-                                <a href="/dashboard/images/delete/<?= $image['id'] ?>" class="btn btn-danger" onclick="return confirm('Do you really want to delete this image?')">Delete</a>
+                                <a href="<?= route_to('images.delete', $image['id']) ?>" class="btn btn-danger" onclick="return confirm('Do you really want to delete this image?')">Delete</a>
                             </div>
                         </div>
                     </div>

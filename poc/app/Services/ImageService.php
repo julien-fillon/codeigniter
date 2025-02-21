@@ -224,13 +224,15 @@ class ImageService
                 throw new \Exception($message);
             }
 
-            // Delete the stored file
-            $filePath = FCPATH . $image->path;
-            // Delete file
-            if (file_exists($filePath) && !unlink($filePath)) {
-                $message = 'Error when deleting the file';
-                log_message('error', $message);
-                throw new \Exception($message);
+            if (!empty($image->path)) {
+                // Delete the stored file
+                $filePath = FCPATH . $image->path;
+                // Delete file
+                if (file_exists($filePath) && !unlink($filePath)) {
+                    $message = 'Error when deleting the file';
+                    log_message('error', $message);
+                    throw new \Exception($message);
+                }
             }
 
             // Delete information in the database

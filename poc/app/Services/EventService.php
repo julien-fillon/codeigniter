@@ -9,11 +9,8 @@ use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\ErrorCorrectionLevel;
 use Endroid\QrCode\QrCode;
-use Endroid\QrCode\Label\Label;
-use Endroid\QrCode\Logo\Logo;
 use Endroid\QrCode\RoundBlockSizeMode;
 use Endroid\QrCode\Writer\PngWriter;
-use Endroid\QrCode\Writer\ValidationException;
 use Transliterator;
 
 class EventService
@@ -183,13 +180,15 @@ class EventService
                 throw new \Exception($message);
             }
 
-            // Delete the stored file
-            $filePath = FCPATH . $event->qrcode;
-            // Delete file
-            if (file_exists($filePath) && !unlink($filePath)) {
-                $message = 'Error when deleting the file';
-                log_message('error', $message);
-                throw new \Exception($message);
+            if (!empty($event->qrcode)) {
+                // Delete the stored file
+                $filePath = FCPATH . $event->qrcode;
+                // Delete file
+                if (file_exists($filePath) && !unlink($filePath)) {
+                    $message = 'Error when deleting the file';
+                    log_message('error', $message);
+                    throw new \Exception($message);
+                }
             }
 
             return $this->eventRepo->delete($event);
