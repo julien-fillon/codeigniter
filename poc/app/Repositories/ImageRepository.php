@@ -55,6 +55,30 @@ class ImageRepository
     }
 
     /**
+     * Recover a list of images by their IDS.
+     *
+     * @param array $imageIds List of IDS of images to recover.
+     * @return array<ImageEntity> List of images in the form of Array.
+     */
+    public function findByIds(array $imageIds): array
+    {
+        if (empty($imageIds)) {
+            return []; // Return an empty painting if no ID is provided
+        }
+
+        // Use of a wherein clause to recover the images
+        try {
+            return $this->imageModel
+                ->whereIn('id', $imageIds)
+                ->findAll();
+        } catch (\Exception $e) {
+            $message = 'Error when recovering images : ' . $e->getMessage();
+            log_message('error', $message);
+            throw new DatabaseException($message);
+        }
+    }
+
+    /**
      * Create a new image.
      *
      * @param  ImageEntity $image

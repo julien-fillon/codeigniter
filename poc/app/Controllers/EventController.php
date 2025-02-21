@@ -4,8 +4,10 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Services\EventService;
+use App\Services\ImageService;
 use App\Validators\EventValidator;
 use CodeIgniter\HTTP\RedirectResponse;
+use CodeIgniter\HTTP\ResponseInterface;
 
 class EventController extends BaseController
 {
@@ -14,11 +16,16 @@ class EventController extends BaseController
      * @var EventService $service Service body to manage business logic.
      */
     protected $eventService;
+    /**
+     * @var ImageService $service Service body to manage business logic.
+     */
+    protected $imageService;
 
     public function __construct()
     {
         helper(['form', 'url']); // Load the necessary helpers
         $this->eventService = new EventService();
+        $this->imageService = new ImageService();
     }
 
     /**
@@ -99,6 +106,60 @@ class EventController extends BaseController
             return redirect()->route('events.index')->with('success', 'Event updated successfully!');
         } catch (\RuntimeException $e) {
             return redirect()->back()->withInput()->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * API d'Association of images with an event
+     *
+     * @param int $eventId
+     * @return \CodeIgniter\HTTP\ResponseInterface
+     */
+    public function attachImages($eventId): ResponseInterface
+    {
+        try {
+            $data = $this->request->getJSON(true);
+            $imageIds = $data['image_ids'] ?? [];
+
+            $images = $this->eventService->attachImagesToEvent($eventId, $imageIds);
+
+            return $this->response->setJSON(['success' => true, 'images' => $images]);
+        } catch (\Exception $e) {
+            log_message('error', '[ImageController] ' . $e->getMessage());
+            return $this->response->setJSON(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Load images for the event in a modal
+     *
+     * @param int $eventId Event ID
+     * @return \CodeIgniter\HTTP\ResponseInterface
+     */
+    public function loadImages(int $eventId): ResponseInterface
+    {
+        try {
+            // Recover all the available images
+            $images = $this->imageService->getList();
+
+            // Check if the event has associated images
+            $event = $this->eventService->getEvent($eventId);
+
+            $associatedImageIds = array_column($event['images'], 'id');
+
+            // Generate HTML for images (improves the Ajax answer)
+            $html = view('dashboard/images/modal/image_list', [
+                'images' => $images,
+                'associatedImageIds' => $associatedImageIds,
+            ]);
+
+            return $this->response->setJSON([
+                'success' => true,
+                'html'    => $html,
+            ]);
+        } catch (\Exception $e) {
+            log_message('error', '[EventController] Failed to load images: ' . $e->getMessage());
+            return $this->response->setJSON(['success' => false, 'message' => $e->getMessage()]);
         }
     }
 
