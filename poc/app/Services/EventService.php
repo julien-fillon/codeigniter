@@ -5,6 +5,15 @@ namespace App\Services;
 use App\Entities\EventEntity;
 use App\Repositories\EventRepository;
 use Config\Database;
+use Endroid\QrCode\Color\Color;
+use Endroid\QrCode\Encoding\Encoding;
+use Endroid\QrCode\ErrorCorrectionLevel;
+use Endroid\QrCode\QrCode;
+use Endroid\QrCode\Label\Label;
+use Endroid\QrCode\Logo\Logo;
+use Endroid\QrCode\RoundBlockSizeMode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\ValidationException;
 use Transliterator;
 
 class EventService
@@ -98,11 +107,18 @@ class EventService
             $datas['created_at'] = $date;
             $datas['updated_at'] = $date;
 
+            $datas['qrcode'] = $this->generateQRCode($datas['shorturl'], $datas['slug']);
+
             $event = new EventEntity();
             $event->fill($datas);
 
             return $this->eventRepo->create($event);
         } catch (\Exception $e) {
+
+            if (isset($datas['qrcode']) && file_exists($datas['qrcode'])) {
+                unlink($datas['qrcode']);
+            }
+
             $message = 'Unable to create the event: ' . $e->getMessage();
             log_message('error', $message);
             throw new \RuntimeException($message);
@@ -167,10 +183,25 @@ class EventService
                 throw new \Exception($message);
             }
 
+            // Delete the stored file
+            $filePath = FCPATH . $event->qrcode;
+            // Delete file
+            if (file_exists($filePath) && !unlink($filePath)) {
+                $message = 'Error when deleting the file';
+                log_message('error', $message);
+                throw new \Exception($message);
+            }
+
             return $this->eventRepo->delete($event);
         } catch (\Exception $e) {
             $message = 'Unable to delete event with ID ' . $id . ': ' . $e->getMessage();
             log_message('error', $message);
+
+            // If the file has been deleted but the BDD fails, it is restored
+            if (!file_exists($filePath)) {
+                file_put_contents($filePath, file_get_contents('php://input'));
+            }
+
             throw new \RuntimeException($message);
         }
     }
@@ -242,5 +273,50 @@ class EventService
         $replace = ['a', 'a', 'a', 'a', 'a', 'a', 'a', 'c', 'c', 'c', 'd', 'e', 'e', 'e', 'e', 'e', 'e', 'e', 'i', 'i', 'i', 'i', 'l', 'n', 'n', 'o', 'o', 'o', 'o', 'o', 'o', 'u', 'u', 'u', 'u', 'u', 'y', 'y', 'z', 'z', 'z'];
 
         return str_replace($search, $replace, $text);
+    }
+
+
+    /**
+     * Generate qrcode file
+     *
+     * @param  string $shortUrl
+     * @param  string $slugName
+     * @return void
+     */
+    private function generateQRCode(string $shortUrl, string $slugName)
+    {
+        $eventUrl = env('app.baseURL') . 'events/' . $shortUrl;
+
+        $writer = new PngWriter();
+        // Create QR code
+        $qrCode = new QrCode(
+            data: $eventUrl,
+            encoding: new Encoding('UTF-8'),
+            errorCorrectionLevel: ErrorCorrectionLevel::Low,
+            size: 300,
+            margin: 10,
+            roundBlockSizeMode: RoundBlockSizeMode::Margin,
+            foregroundColor: new Color(0, 0, 0), // Black color for blocks
+            backgroundColor: new Color(255, 255, 255) // White color for the background
+        );
+
+        $result = $writer->write($qrCode, null, null);
+
+        // Determine the recording path (in the "Public/Qrcodes" file)
+        $outputDir = FCPATH . 'qrcodes/';
+        // Check if the recording folder exists, otherwise create it
+        if (!is_dir($outputDir)) {
+            mkdir($outputDir, 0755, true);
+        }
+
+        $targetFileName = 'qrcodes/' .  $slugName . '-' . $shortUrl . '.png';
+        $outputFile = FCPATH . $targetFileName;
+
+
+
+        // Save the QR code generated
+        $result->saveToFile($outputFile);
+
+        return '/' . $targetFileName;
     }
 }

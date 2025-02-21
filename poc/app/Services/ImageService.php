@@ -57,6 +57,7 @@ class ImageService
      * @param string $name
      * @param string $category
      * @return bool
+     * @throws \RuntimeException|\Exception
      */
     public function uploadImage(UploadedFile $file, string $name, string $category): bool
     {
@@ -90,6 +91,7 @@ class ImageService
 
                 $this->cleanupFiles([$tmpPath]);
 
+                $date = date('Y-m-d H:i:s');
                 $image = new ImageEntity();
                 $image->name = $name;
                 $image->category = $category;
@@ -98,15 +100,15 @@ class ImageService
                 $image->width = self::IMAGE_WIDTH;
                 $image->height = self::IMAGE_HEIGHT;
                 $image->type = self::IMAGE_TYPE;
-                $image->created_at = date('Y-m-d H:i:s');
-                $image->updated_at = date('Y-m-d H:i:s');
+                $image->created_at = $date;
+                $image->updated_at = $date;
 
                 return $this->imageRepo->create($image);
             } catch (ImageException | RuntimeException $e) {
                 $message = 'Error when uploading the image : ' . $e->getMessage();
                 log_message('error', $message);
                 $this->cleanupFiles([$tmpPath, $fullDestPath]);
-                throw new \Exception($message);
+                throw new \RuntimeException($message);
             }
         }
 
@@ -244,7 +246,7 @@ class ImageService
             log_message('error', $message);
 
             // If the file has been deleted but the BDD fails, it is restored
-            if (!file_exists(FCPATH . $image->path)) {
+            if (!file_exists($filePath)) {
                 file_put_contents($filePath, file_get_contents('php://input'));
             }
 

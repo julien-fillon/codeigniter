@@ -22,8 +22,11 @@
 
         <form action="/dashboard/events/update/<?= $event['id']; ?>" method="post">
 
-            <div class="mb-3">
-                <p>Shorturl : <?= $event['shorturl']; ?></p>
+            <div class="mb-3 row">
+                <?php if (!empty($event['qrcode'])) : ?>
+                    <p class="col-8">Shorturl : <?= $event['qrcode']; ?></p>
+                    <img src="<?= base_url($event['qrcode']) ?>" class="col-2" alt="<?= $event['qrcode'] ?>">
+                <?php endif; ?>
             </div>
 
             <div class="mb-3">
