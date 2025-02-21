@@ -121,10 +121,6 @@ class EventController extends BaseController
             $data = $this->request->getJSON(true);
             $imageIds = $data['image_ids'] ?? [];
 
-            if (empty($imageIds)) {
-                return $this->response->setJSON(['success' => false, 'message' => 'No images selected.']);
-            }
-
             $images = $this->eventService->attachImagesToEvent($eventId, $imageIds);
 
             return $this->response->setJSON(['success' => true, 'images' => $images]);

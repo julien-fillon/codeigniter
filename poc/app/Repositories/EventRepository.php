@@ -124,14 +124,17 @@ class EventRepository
 
         // Add the new associations
         $data = [];
-        foreach ($images as $image) {
-            $data[] = [
-                'event_id' => $event->id,
-                'image_id' => $image->id,
-                'created_at' => date('Y-m-d H:i:s'),
-            ];
+        if (!empty($images)) {
+            foreach ($images as $image) {
+                $data[] = [
+                    'event_id' => $event->id,
+                    'image_id' => $image->id,
+                    'created_at' => date('Y-m-d H:i:s'),
+                ];
+            }
+
+            $builder->insertBatch($data);
         }
-        $builder->insertBatch($data);
     }
 
     /**

@@ -161,11 +161,6 @@
         // Recover all the selected images
         const selectedImages = Array.from(document.querySelectorAll('#image-list input[name="selected_images[]"]:checked')).map(input => input.value);
 
-        if (selectedImages.length === 0) {
-            alert('Please select at least one image.');
-            return;
-        }
-
         // Ajax call to record images associated with the event
         fetch('<?= route_to("events.attach_images", $event["id"]) ?>', {
                 method: 'POST',
@@ -198,9 +193,6 @@
                     const bootstrapModal = bootstrap.Modal.getInstance(modal);
                     bootstrapModal.hide();
 
-                    alert('Images associated with the event successfully.');
-                } else {
-                    alert('Failed to associate images. Please try again.');
                 }
             })
             .catch(error => {

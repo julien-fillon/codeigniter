@@ -184,10 +184,9 @@ class EventService
 
         // Check if the images exist
         $images = $this->imageRepo->findByIds($imageIds);
-        if (count($images) !== count($imageIds)) {
+        if (!empty($images) && (count($images) !== count($imageIds))) {
             throw new \Exception('One or more images not found.');
         }
-
         // Associate images with the event
         $this->eventRepo->attachImages($event, $images);
 
