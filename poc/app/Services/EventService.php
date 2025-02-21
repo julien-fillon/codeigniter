@@ -217,10 +217,30 @@ class EventService
         $result = [];
 
         foreach ($urls as $url) {
+
+            // If the URL does not have a scheme (http:// or https://), add "http://"
+            if (!str_starts_with($url, 'http://') && !str_starts_with($url, 'https://')) {
+                $url = 'https://' . $url; // Default to http:// if no scheme is provided
+            }
+
             $host = parse_url($url, PHP_URL_HOST);
 
-            // Extract only the sub-domain or the main domain (YouTube, Facebook, LinkedIn)
-            $platform = explode('.', $host)[1];
+            if ($host === null) {
+                log_message('error', 'Invalid URL encountered: ' . $url);
+                continue; // Skip invalid URLs
+            }
+
+            // Remove common subdomains like 'www.' or country/language codes (e.g., 'fr.')
+            $hostParts = explode('.', $host); // Split into parts (e.g., ['www', 'youtube', 'com'])
+
+            // Extract the platform name (ensure we exclude 'www', 'fr', etc.)
+            if (count($hostParts) > 2) {
+                // Assume second-to-last part is the platform (e.g., youtube in www.youtube.com)
+                $platform = $hostParts[count($hostParts) - 2];
+            } else {
+                // Fallback: If there's no subdomain, use the first part
+                $platform = $hostParts[0];
+            }
 
             // Associate the platform with its URL in the table
             $result[$platform] = $url;

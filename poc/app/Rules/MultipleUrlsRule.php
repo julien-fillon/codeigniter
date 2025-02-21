@@ -20,6 +20,12 @@ class MultipleUrlsRule
 
         // Check each URL with Filter_var
         foreach ($urls as $url) {
+
+            // If the URL does not have a scheme (http:// or https://), add "http://"
+            if (!str_starts_with($url, 'http://') && !str_starts_with($url, 'https://')) {
+                $url = 'https://' . $url; // Default to http:// if no scheme is provided
+            }
+
             if (!filter_var($url, FILTER_VALIDATE_URL)) {
                 return false; // Return false if only one URL is not valid
             }
