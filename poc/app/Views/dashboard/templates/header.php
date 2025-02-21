@@ -20,7 +20,7 @@
                     </li>
                     <li class="nav-item">
                         <!-- Lien vers la gestion des événements -->
-                        <a class="nav-link" href="<?= route_to('event.index') ?>">Events</a>
+                        <a class="nav-link" href="<?= route_to('events.index') ?>">Events</a>
                     </li>
                 </ul>
                 <div class="d-flex ms-3">

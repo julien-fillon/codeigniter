@@ -20,7 +20,7 @@
             </div>
         <?php endif; ?>
 
-        <?= form_open(route_to('event.store')) ?>
+        <?= form_open(route_to('events.store')) ?>
 
         <div class="mb-3">
             <?= form_label('Event Name:', 'event_name', ['class' => 'form-label']) ?>

@@ -14,7 +14,7 @@ class ImageController extends BaseController
      * @var ImageService $service Service body to manage business logic.
      */
     protected $imageService;
-    protected $redirect = '/dashboard/images';
+    protected $redirect = 'images.index';
 
     public function __construct()
     {
@@ -57,7 +57,7 @@ class ImageController extends BaseController
             $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
         }
 
-        return redirect()->to($this->redirect)->with($message[0], $message[1]);
+        return redirect()->route($this->redirect)->with($message[0], $message[1]);
     }
 
     /**
@@ -85,7 +85,7 @@ class ImageController extends BaseController
             $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
         }
 
-        return redirect()->to($this->redirect)->with($message[0], $message[1]);
+        return redirect()->route($this->redirect)->with($message[0], $message[1]);
     }
 
     /**
@@ -105,6 +105,6 @@ class ImageController extends BaseController
             $message = ['error', 'An error occurred when deleting the image : ' . $e->getMessage()];
         }
 
-        return redirect()->to($this->redirect)->with($message[0], $message[1]);
+        return redirect()->route($this->redirect)->with($message[0], $message[1]);
     }
 }

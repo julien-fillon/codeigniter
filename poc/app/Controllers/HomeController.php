@@ -13,6 +13,6 @@ class HomeController extends BaseController
      */
     public function index(): RedirectResponse
     {
-        return redirect()->to('/login');
+        return redirect()->route('auth.login');
     }
 }

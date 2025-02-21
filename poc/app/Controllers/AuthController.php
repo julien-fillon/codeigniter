@@ -29,7 +29,7 @@ class AuthController extends BaseController
     {
         // Check if the user is already connected
         if (session()->get('isLoggedIn')) {
-            return redirect()->to('/dashboard');
+            return redirect()->route('dashboard.index');
         }
 
         helper(['form']);
@@ -56,7 +56,7 @@ class AuthController extends BaseController
             $password = $this->request->getPost('password');
 
             if ($this->userService->login($email, $password)) {
-                return redirect()->to('/dashboard');
+                return redirect()->route('dashboard.index');
             }
         } catch (\Exception $e) {
             $message = ['error' => 'An error occurred when login : ' . $e->getMessage()];
@@ -74,6 +74,6 @@ class AuthController extends BaseController
     {
         // Destroy the session
         session()->destroy();
-        return redirect()->to('/login'); // Return to the connection screen
+        return redirect()->route('auth.login'); // Return to the connection screen
     }
 }

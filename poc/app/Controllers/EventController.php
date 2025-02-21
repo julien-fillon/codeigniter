@@ -57,7 +57,7 @@ class EventController extends BaseController
             $data = $this->request->getPost();
             $this->eventService->createEvent($data);
 
-            return redirect()->to('dashboard/events')->with('success', 'Event created successfully!');
+            return redirect()->route('events.index')->with('success', 'Event created successfully!');
         } catch (\RuntimeException $e) {
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
@@ -96,7 +96,7 @@ class EventController extends BaseController
             $data = $this->request->getPost();
             $this->eventService->updateEvent($id, $data);
 
-            return redirect()->to('/dashboard/events')->with('success', 'Event updated successfully!');
+            return redirect()->route('events.index')->with('success', 'Event updated successfully!');
         } catch (\RuntimeException $e) {
             return redirect()->back()->withInput()->with('error', $e->getMessage());
         }
@@ -112,7 +112,7 @@ class EventController extends BaseController
     {
         try {
             $this->eventService->deleteEvent($id);
-            return redirect()->to('/dashboard/events')->with('success', 'Event deleted successfully!');
+            return redirect()->route('events.index')->with('success', 'Event deleted successfully!');
         } catch (\RuntimeException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }

@@ -11,7 +11,7 @@ class AuthGuard implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         if (!session()->get('isLoggedIn')) {
-            return redirect()->to('/login')->with('error', 'Veuillez vous connecter');
+            return redirect()->route('auth.login')->with('error', 'Veuillez vous connecter');
         }
     }
 

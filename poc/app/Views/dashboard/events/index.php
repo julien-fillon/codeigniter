@@ -20,7 +20,7 @@
             </div>
         <?php endif; ?>
 
-        <a href="<?= route_to('event.create') ?>" class="btn btn-primary mb-3">Create New Event</a>
+        <a href="<?= route_to('events.create') ?>" class="btn btn-primary mb-3">Create New Event</a>
 
         <table class="table table-striped table-hover">
             <thead>
@@ -39,10 +39,10 @@
                         <td><?= esc($event['organizer_name']) . ' ' . esc($event['organizer_surname']) ?></td>
                         <td>
                             <!-- Modify button -->
-                            <a href="<?= route_to('event.edit', $event['id']) ?>" class="btn btn-warning btn-sm">Edit</a>
+                            <a href="<?= route_to('events.edit', $event['id']) ?>" class="btn btn-warning btn-sm">Edit</a>
 
                             <!-- Delete button -->
-                            <a href="<?= route_to('event.delete', $event['id']) ?>"
+                            <a href="<?= route_to('events.delete', $event['id']) ?>"
                                 class="btn btn-danger btn-sm"
                                 onclick="return confirm('Are you sure you want to delete this event?')">
                                 Delete

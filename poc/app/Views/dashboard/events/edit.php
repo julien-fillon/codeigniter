@@ -20,7 +20,7 @@
             </div>
         <?php endif; ?>
 
-        <?= form_open(route_to('event.update', $event['id'])) ?>
+        <?= form_open(route_to('events.update', $event['id'])) ?>
 
         <!-- QRCODE display -->
         <div class="mb-3 row">
