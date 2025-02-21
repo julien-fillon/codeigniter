@@ -107,4 +107,64 @@ class EventRepository
             throw new DatabaseException($message);
         }
     }
+
+    /**
+     * Associate images with an event.
+     *
+     * @param EventEntity $event
+     * @param array<ImageEntity> $images
+     */
+    public function attachImages(EventEntity $event, array $images): void
+    {
+        $db = db_connect();
+        $builder = $db->table('event_images');
+
+        // Deletes old associations
+        $builder->where('event_id', $event->id)->delete();
+
+        // Add the new associations
+        $data = [];
+        foreach ($images as $image) {
+            $data[] = [
+                'event_id' => $event->id,
+                'image_id' => $image->id,
+                'created_at' => date('Y-m-d H:i:s'),
+            ];
+        }
+        $builder->insertBatch($data);
+    }
+
+    /**
+     * Recovers all the images related to an event.
+     *
+     * @param EventEntity $event
+     * @return array
+     */
+    public function findImagesByEventId(EventEntity $event): array
+    {
+        $db = db_connect();
+        $builder = $db->table('event_images');
+        $builder->select('images.*');
+        $builder->join('images', 'images.id = event_images.image_id');
+        $builder->where('event_images.event_id', $event->id);
+
+        return $builder->get()->getResultArray();
+    }
+
+    /**
+     * Recovers all events related to an image.
+     *
+     * @param int $imageId
+     * @return array
+     */
+    public function findEventsByImageId(int $imageId): array
+    {
+        $db = db_connect();
+        $builder = $db->table('event_images');
+        $builder->select('events.*');
+        $builder->join('events', 'events.id = event_images.event_id');
+        $builder->where('event_images.image_id', $imageId);
+
+        return $builder->get()->getResultArray();
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Entities\EventEntity;
 use App\Repositories\EventRepository;
+use App\Repositories\ImageRepository;
 use Config\Database;
 use Endroid\QrCode\Color\Color;
 use Endroid\QrCode\Encoding\Encoding;
@@ -17,11 +18,13 @@ class EventService
 {
 
     protected $eventRepo;
+    protected $imageRepo;
     protected $db;
 
     public function __construct()
     {
         $this->eventRepo = new EventRepository();
+        $this->imageRepo = new ImageRepository();
         $this->db = Database::connect();
     }
 
@@ -70,6 +73,9 @@ class EventService
                 log_message('error', $message);
                 throw new \Exception($message);
             }
+
+            // Image associated with the event
+            $event->images = $this->eventRepo->findImagesByEventId($event);
 
             return $event->toArray();
         } catch (\Exception $e) {
@@ -160,6 +166,32 @@ class EventService
             log_message('error', $message);
             throw new \RuntimeException($message);
         }
+    }
+
+    /**
+     * Associate images with an event
+     *
+     * @param int $eventId
+     * @param array $imageIds
+     */
+    public function attachImagesToEvent(int $eventId, array $imageIds): array
+    {
+        // Check if the event exists
+        $event = $this->eventRepo->findById($eventId);
+        if (!$event) {
+            throw new \Exception('Event not found.');
+        }
+
+        // Check if the images exist
+        $images = $this->imageRepo->findByIds($imageIds);
+        if (count($images) !== count($imageIds)) {
+            throw new \Exception('One or more images not found.');
+        }
+
+        // Associate images with the event
+        $this->eventRepo->attachImages($event, $images);
+
+        return $this->eventRepo->findImagesByEventId($event);
     }
 
     /**
