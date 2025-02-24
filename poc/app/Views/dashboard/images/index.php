@@ -30,7 +30,8 @@
                         <div class="card">
                             <img src="<?= base_url($image['path']) ?>" class="card-img-top" alt="<?= $image['name'] ?>">
                             <div class="card-body text-center">
-                                <p>Category : <?= $image['category']; ?></p>
+                                <p>Category : <?= ucfirst($image['category']); ?></p>
+                                <p>Name : <?= $image['name']; ?></p>
                                 <button type="button" class="btn btn-warning btn-edit" data-url="<?= route_to('images.edit', $image['id']); ?>">
                                     Edit
                                 </button>
