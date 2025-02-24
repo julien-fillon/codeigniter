@@ -156,6 +156,6 @@
 
 <?= view('dashboard/templates/footer') ?>
 
-<script src="<?= base_url('assets/js/dashboard/events/edit.js'); ?>" defer></script>
+<script src="<?= base_url('assets/js/dashboard/events/edit.js'); ?>"></script>
 
 <?= $this->endSection() ?>

@@ -137,6 +137,9 @@ class ImageController extends BaseController
      */
     public function update(int $id): RedirectResponse
     {
+        $request = service('request');
+        $redirectUrl = $request->getServer('HTTP_REFERER');
+
         // true because it is an edition
         if (!$this->validate(ImageValidator::rules(true))) {
             return redirect()->back()->withInput()->with('error', implode(' ', $this->validator->getErrors()));
@@ -154,7 +157,7 @@ class ImageController extends BaseController
             $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
         }
 
-        return redirect()->route($this->redirect)->with($message[0], $message[1]);
+        return redirect()->to($redirectUrl)->with($message[0], $message[1]);
     }
 
     /**

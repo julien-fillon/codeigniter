@@ -18,7 +18,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadModal" onclick="setEventId(<?= $id; ?>)">Add New Image</button>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#uploadModal">Add New Image</button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <button type="button" class="btn btn-primary" id="save-selected-images" data-save-url="<?= route_to('events.attach_images', $event['id']) ?>">Save Selection</button>
             </div>

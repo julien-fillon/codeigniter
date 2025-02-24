@@ -79,4 +79,40 @@ document.addEventListener('DOMContentLoaded', function () {
                 modalBody.innerHTML = '<p>An error occurred while loading images.</p>';
             });
     });
+
+    // Event earphone on a parent container
+    document.querySelector('#image-list').addEventListener('dblclick', function(e) {
+        // Check if the target element is an image with the "Img-Thumbnail" class
+        if (e.target && e.target.classList.contains('img-thumbnail')) {
+            const fetchUrl = e.target.getAttribute('data-url'); // Récupération de l'URL
+            console.log(fetchUrl);
+
+            // Modal recovery and loading message
+            const modalBody = document.querySelector('#editModal .modal-body');
+            modalBody.innerHTML = '<p>Chargement en cours...</p>';
+
+            // Image data loading via Ajax
+            fetch(fetchUrl, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        modalBody.innerHTML = data.html;
+                    } else {
+                        modalBody.innerHTML = '<p>Impossible de récupérer les données.</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des données :', error);
+                    modalBody.innerHTML = '<p>Une erreur est survenue.</p>';
+                });
+
+            // Modal display
+            const modal = new bootstrap.Modal(document.getElementById('editModal'));
+            modal.show();
+        }
+    });
 });
