@@ -17,6 +17,7 @@ $routes->GET('/dashboard', 'DashboardController::index', ['filter' => 'authGuard
 $routes->GET('/dashboard/images', 'ImageController::index', ['filter' => 'authGuard', 'as' => 'images.index']);
 $routes->POST('/dashboard/images/upload', 'ImageController::upload', ['filter' => 'authGuard', 'as' => 'images.upload']);
 $routes->POST('/dashboard/images/upload/event', 'ImageController::uploadImageEvent', ['filter' => 'authGuard', 'as' => 'images.upload.event']);
+$routes->GET('/dashboard/images/edit/(:num)', 'ImageController::editForm/$1', ['filter' => 'authGuard', 'as' => 'images.edit']);
 $routes->POST('/dashboard/images/update/(:num)', 'ImageController::update/$1', ['filter' => 'authGuard', 'as' => 'images.update']);
 $routes->GET('/dashboard/images/delete/(:num)', 'ImageController::delete/$1', ['filter' => 'authGuard', 'as' => 'images.delete']);
 
@@ -28,5 +29,5 @@ $routes->GET('/dashboard/events/edit/(:num)', 'EventController::edit/$1', ['filt
 $routes->POST('/dashboard/events/update/(:num)', 'EventController::update/$1', ['filter' => 'authGuard', 'as' => 'events.update']);
 $routes->GET('/dashboard/events/delete/(:num)', 'EventController::delete/$1', ['filter' => 'authGuard', 'as' => 'events.delete']);
 # Ajax
-$routes->POST('/dashboard/events/(:num)/attach/images', 'EventController::attachImages/$1', ['as' => 'events.attach_images']);
+$routes->POST('/dashboard/events/(:num)/attach/images', 'EventController::attachImages/$1', ['filter' => 'authGuard', 'as' => 'events.attach_images']);
 $routes->GET('/dashboard/events/(:num)/load-images', 'EventController::loadImages/$1', ['filter' => 'authGuard', 'as' => 'events.load_images']);

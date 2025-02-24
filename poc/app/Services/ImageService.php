@@ -83,6 +83,33 @@ class ImageService
     }
 
     /**
+     * Recovers a single image by his ID.
+     *
+     * @param int $id The ID of the image.
+     * @return ImageEntity Details of the image.
+     * @throws \RuntimeException
+     */
+    public function getImage(int $id): ImageEntity
+    {
+        try {
+            $image = $this->imageRepo->findById($id);
+
+            if (!$image) {
+                $message = 'Image not found';
+                log_message('error', $message);
+                throw new \Exception($message);
+            }
+
+            return $image;
+        } catch (\Exception $e) {
+            $message = 'Unable to retrieve image with ID ' . $id . ': ' . $e->getMessage();
+            log_message('error', $message);
+            throw new \RuntimeException($message);
+        }
+    }
+
+
+    /**
      * Upload a new image.
      * 
      * @param UploadedFile $file

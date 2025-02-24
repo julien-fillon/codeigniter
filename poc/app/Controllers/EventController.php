@@ -128,7 +128,7 @@ class EventController extends BaseController
 
             return $this->response->setJSON(['success' => true, 'images' => $images]);
         } catch (\Exception $e) {
-            log_message('error', '[ImageController] ' . $e->getMessage());
+            log_message('error', '[EventController] ' . $e->getMessage());
             return $this->response->setJSON(['success' => false, 'message' => $e->getMessage()]);
         }
     }

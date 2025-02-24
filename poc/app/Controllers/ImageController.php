@@ -9,6 +9,7 @@ use App\Services\EventService;
 use App\Services\ImageService;
 use App\Validators\ImageValidator;
 use CodeIgniter\HTTP\RedirectResponse;
+use CodeIgniter\HTTP\ResponseInterface;
 
 class ImageController extends BaseController
 {
@@ -103,6 +104,29 @@ class ImageController extends BaseController
         }
 
         return redirect()->route('events.edit', [$entityId])->with($message[0], $message[1]);
+    }
+
+    /**
+     * Complete edit form
+     *
+     * @param  string $id
+     * @return \CodeIgniter\HTTP\ResponseInterface
+     */
+    public function editForm(string $id): ResponseInterface
+    {
+        try {
+            // Recover the image by ID
+            $image = $this->imageService->getImage($id)->toArray();
+            // Generate the HTML form (for injection in the modal)
+            $formHtml = view('dashboard/images/modal/edit_form', ['image' => $image]);
+            return $this->response->setJSON([
+                'success' => true,
+                'html' => $formHtml,
+            ]);
+        } catch (\Exception $e) {
+            log_message('error', '[ImageController] ' . $e->getMessage());
+            return $this->response->setJSON(['success' => false, 'message' => $e->getMessage()]);
+        }
     }
 
     /**

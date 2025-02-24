@@ -46,7 +46,7 @@
             </div>
 
             <!-- Button to open the modal -->
-            <button type="button" class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#imageSelectorModal">
+            <button type="button" class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#imageSelectorModal" data-load-url="<?= route_to('events.load_images', $event['id']) ?>">
                 Select Images
             </button>
 
@@ -156,75 +156,6 @@
 
 <?= view('dashboard/templates/footer') ?>
 
-<script>
-    document.querySelector('#save-selected-images').addEventListener('click', function() {
-        // Recover all the selected images
-        const selectedImages = Array.from(document.querySelectorAll('#image-list input[name="selected_images[]"]:checked')).map(input => input.value);
-
-        // Ajax call to record images associated with the event
-        fetch('<?= route_to("events.attach_images", $event["id"]) ?>', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Requested-With': 'XMLHttpRequest',
-                    '<?= csrf_token() ?>': '<?= csrf_hash() ?>',
-                },
-                body: JSON.stringify({
-                    image_ids: selectedImages
-                }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update the list of associated images in the DOM
-                    const associatedImagesContainer = document.querySelector('#associated-images');
-                    associatedImagesContainer.innerHTML = '';
-
-                    data.images.forEach(image => {
-                        associatedImagesContainer.innerHTML += `
-                        <div class="col-md-1 mb-3">
-                            <img src="<?= base_url() ?>/${image.path}" alt="${image.name}" class="img-thumbnail">
-                        </div>
-                    `;
-                    });
-
-                    // Fermer La Modal
-                    const modal = document.querySelector('#imageSelectorModal');
-                    const bootstrapModal = bootstrap.Modal.getInstance(modal);
-                    bootstrapModal.hide();
-
-                }
-            })
-            .catch(error => {
-                console.error(error);
-                alert('An error occurred. Please try again.');
-            });
-    });
-
-    // Click management on the button to open the modal
-    document.querySelector('[data-bs-target="#imageSelectorModal"]').addEventListener('click', function() {
-        const modalBody = document.querySelector('#image-list');
-        modalBody.innerHTML = '<p>Loading images...</p>'; // Indicates that the images are being loaded
-
-        // Dynamically load images via Ajax
-        fetch('<?= route_to("events.load_images", $event["id"]) ?>', {
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                },
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.html) {
-                    modalBody.innerHTML = data.html; // Insert the HTML received from the server
-                } else {
-                    modalBody.innerHTML = '<p>Failed to load images. Please try again later.</p>';
-                }
-            })
-            .catch(error => {
-                console.error('Erreur lors du chargement des images :', error);
-                modalBody.innerHTML = '<p>An error occurred while loading images.</p>';
-            });
-    });
-</script>
+<script src="<?= base_url('assets/js/dashboard/events/edit.js'); ?>" defer></script>
 
 <?= $this->endSection() ?>
