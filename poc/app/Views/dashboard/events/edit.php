@@ -50,10 +50,12 @@
                 Select Images
             </button>
 
-            <?= view('dashboard/images/modal/list', ['id' => $event['id'], 'entity_type' => $entity_type]); ?>
+            <?= view('dashboard/images/modal/list', ['id' => $event['id']]); ?>
+            <?= view('dashboard/images/modal/event/upload', ['id' => $event['id']]); ?>
         </div>
 
         <?= form_open(route_to('events.update', $event['id'])) ?>
+        <?= csrf_field() ?>
         <!-- Event name -->
         <div class="mb-3">
             <?= form_label('Event Name:', 'event_name', ['class' => 'form-label']) ?>

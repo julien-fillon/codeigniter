@@ -22,5 +22,3 @@
         </div>
     </div>
 </div>
-
-<?= view('dashboard/images/modal/upload', ['id' => $id, 'entity_type' => $entity_type]); ?>

@@ -7,6 +7,7 @@ use App\Services\EventService;
 use App\Services\ImageService;
 use App\Validators\EventValidator;
 use App\Entities\ImageEntity;
+use App\Enums\ImageCategory;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
 
@@ -80,8 +81,8 @@ class EventController extends BaseController
     public function edit(int $id): string|RedirectResponse
     {
         try {
-            $data['event'] = $this->eventService->getEvent($id);
-            $data['entity_type'] = ImageEntity::CATEGORY_EVENT;
+            $data['event'] = $this->eventService->getEvent($id)->toArray();
+            $data['entity_type'] = ImageCategory::EVENT->value;
             return view('dashboard/events/edit', $data);
         } catch (\RuntimeException $e) {
             return redirect()->back()->with('error', $e->getMessage());
@@ -142,10 +143,10 @@ class EventController extends BaseController
     {
         try {
             // Recover all the available images
-            $images = $this->imageService->getListCategory(ImageEntity::CATEGORY_EVENT);
+            $images = $this->imageService->getListCategory(ImageCategory::EVENT->value);
 
             // Check if the event has associated images
-            $event = $this->eventService->getEvent($eventId);
+            $event = $this->eventService->getEvent($eventId)->toArray();
 
             $associatedImageIds = array_column($event['images'], 'id');
 

@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Entities\EventEntity;
 use App\Entities\ImageEntity;
+use App\Enums\ImageCategory;
 use App\Repositories\EventRepository;
 use App\Repositories\ImageRepository;
 use CodeIgniter\HTTP\Files\UploadedFile;
@@ -124,7 +126,7 @@ class ImageService
                 $date = date('Y-m-d H:i:s');
                 $image = new ImageEntity();
                 $image->name = $name;
-                $image->category = $category;
+                $image->category = ImageCategory::from($category)->value;
                 $image->path = $destPath;
                 $image->size = $size;
                 $image->width = self::IMAGE_WIDTH;
@@ -204,7 +206,7 @@ class ImageService
             }
 
             $image->name = $name;
-            $image->category = $category;
+            $image->category = ImageCategory::from($category)->value;
             $image->path = $destPath;
             $image->size = $size;
             $image->width = self::IMAGE_WIDTH;
@@ -238,33 +240,20 @@ class ImageService
     /**
      * Associate an image with an entity according to the category
      *
-     * @param int $entityId ID of the entity (ex: event)
-     * @param string $category Category to which the image belongs
+     * @param EventEntity $entity (ex: eventEntity)
      * @param ImageEntity $image The image entity to associate
      * @return bool Indicates if the association was successfully carried out
      * @throws Exception If the entity to which associating the image does not exist
      */
-    public function associateImageWithEntity(int $entityId, string $category, ImageEntity $image): bool
+    public function associateImageWithEntity(EventEntity $entity, ImageEntity $image): bool
     {
-        if (empty($entityId)) {
-            log_message('error', 'entity_id ne peut pas être vide');
-            throw new \Exception('Entity ID cannot be empty');
-        }
 
         try {
-            switch ($category) {
-                case ImageEntity::CATEGORY_EVENT:
-
-                    $event = $this->eventRepo->findById($entityId);
-
-                    if (!$event) {
-                        $message = sprintf('Événement non trouvé pour ID : %d', $entityId);
-                        log_message('error', $message);
-                        throw new \Exception($message);
-                    }
+            switch ($entity) {
+                case $entity instanceof EventEntity:
 
                     // Recover the existing images associated with this event
-                    $images = $this->eventRepo->findImagesByEvent($event);
+                    $images = $this->eventRepo->findImagesByEvent($entity);
 
                     // Create a list of image IDs, including the ID of the new image
                     $imageIds = array_merge(array_column($images, 'id'), [$image->id]);
@@ -273,13 +262,11 @@ class ImageService
                     $updatedImages = $this->imageRepo->findByIds($imageIds);
 
                     // Attach the updated images to the event
-                    $this->eventRepo->attachImages($event, $updatedImages);
+                    $this->eventRepo->attachImages($entity, $updatedImages);
                     break;
 
                 default:
-                    $message = sprintf('Catégorie inconnue : %s', $category);
-                    log_message('error', $message);
-                    throw new \Exception($message);
+                    break;
             }
 
             return true;

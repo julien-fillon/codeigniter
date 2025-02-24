@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Entities\EventEntity;
 use App\Entities\ImageEntity;
+use App\Enums\ImageCategory;
 use App\Models\EventModel;
 use CodeIgniter\Database\Exceptions\DatabaseException;
 use Exception;
@@ -151,7 +152,7 @@ class EventRepository
         $builder->select('images.*');
         $builder->join('images', 'images.id = event_images.image_id');
         $builder->where('event_images.event_id', $event->id);
-        $builder->where('images.category', ImageEntity::CATEGORY_EVENT);
+        $builder->where('images.category', ImageCategory::EVENT->value);
 
         return $builder->get()->getResultArray();
     }

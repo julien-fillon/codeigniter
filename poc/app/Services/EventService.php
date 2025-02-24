@@ -60,10 +60,10 @@ class EventService
      * Recovers a single event by his ID.
      *
      * @param int $id The ID of the event.
-     * @return array|null Details of the event or null if not found.
+     * @return EventEntity Details of the event.
      * @throws \RuntimeException
      */
-    public function getEvent(int $id): array
+    public function getEvent(int $id): EventEntity
     {
         try {
             $event = $this->eventRepo->findById($id);
@@ -77,7 +77,7 @@ class EventService
             // Image associated with the event
             $event->images = $this->eventRepo->findImagesByEvent($event);
 
-            return $event->toArray();
+            return $event;
         } catch (\Exception $e) {
             $message = 'Unable to retrieve event with ID ' . $id . ': ' . $e->getMessage();
             log_message('error', $message);

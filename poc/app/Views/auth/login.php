@@ -3,6 +3,7 @@
 <?= $this->section('content') ?>
 
 <main class="container my-4">
+    <!-- Connection form display-->
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
@@ -11,36 +12,65 @@
                         <h2>Connexion</h2>
                     </div>
                     <div class="card-body">
+
                         <!-- Validation errors display -->
-                        <?php if (isset($validation)): ?>
+                        <?php if (isset($validation)) : ?>
                             <div class="alert alert-danger">
-                                <?= $validation->listErrors() ?>
+                                <?= $validation->listErrors(); ?>
                             </div>
                         <?php endif; ?>
 
-                        <?php if (isset($error)): ?>
+                        <!-- Exceptional errors display -->
+                        <?php if (isset($error)) : ?>
                             <div class="alert alert-danger">
-                                <?= $error; ?>
+                                <?= esc($error); ?>
                             </div>
                         <?php endif; ?>
 
                         <!-- Form -->
-                        <form action="<?= site_url('auth/loginSubmit') ?>" method="post">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">Email :</label>
-                                <input type="text" name="email" id="email" class="form-control" value="<?= set_value('email') ?>" placeholder="Entrez votre email">
-                            </div>
+                        <?= form_open(route_to('auth.loginSubmit')) ?>
+                        <?= csrf_field() ?>
 
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Mot de passe :</label>
-                                <input type="password" name="password" id="password" class="form-control" placeholder="Entrez votre mot de passe">
-                            </div>
+                        <!-- Field email -->
+                        <div class="mb-3">
+                            <?= form_label('Email :', 'email', ['class' => 'form-label']) ?>
+                            <?= form_input([
+                                'name'  => 'email',
+                                'id'    => 'email',
+                                'type'  => 'text',
+                                'class' => 'form-control ' . (isset($validation) && $validation->hasError('email') ? 'is-invalid' : ''),
+                                'value' => set_value('email'),
+                                'placeholder' => 'Enter your email',
+                            ]) ?>
+                            <?php if (isset($validation) && $validation->hasError('email')) : ?>
+                                <div class="invalid-feedback">
+                                    <?= $validation->getError('email') ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
 
-                            <button type="submit" class="btn btn-primary w-100">Connexion</button>
-                        </form>
-                    </div>
-                    <div class="card-footer text-center">
-                        <small class="text-muted">Pas encore de compte ? <a href="<?= site_url('auth/register') ?>">Inscrivez-vous ici</a>.</small>
+                        <!-- Password field -->
+                        <div class="mb-3">
+                            <?= form_label('Password :', 'password', ['class' => 'form-label']) ?>
+                            <?= form_password([
+                                'name'  => 'password',
+                                'id'    => 'password',
+                                'class' => 'form-control ' . (isset($validation) && $validation->hasError('password') ? 'is-invalid' : ''),
+                                'placeholder' => 'Enter your password',
+                            ]) ?>
+                            <?php if (isset($validation) && $validation->hasError('password')) : ?>
+                                <div class="invalid-feedback">
+                                    <?= $validation->getError('password') ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+
+                        <!-- Submission button -->
+                        <div class="mb-3">
+                            <?= form_submit('submit', 'Connexion', ['class' => 'btn btn-primary w-100']) ?>
+                        </div>
+
+                        <?= form_close() ?>
                     </div>
                 </div>
             </div>

@@ -7,7 +7,7 @@ use CodeIgniter\Router\RouteCollection;
  */
 $routes->GET('/', 'HomeController::index');
 $routes->GET('/login', 'AuthController::login', ['as' => 'auth.login']);
-$routes->POST('/auth/loginSubmit', 'AuthController::loginSubmit');
+$routes->POST('/auth/loginSubmit', 'AuthController::loginSubmit', ['as' => 'auth.loginSubmit']);
 $routes->GET('/logout', 'AuthController::logout', ['as' => 'auth.logout']);
 
 # Dashboard
@@ -15,7 +15,8 @@ $routes->GET('/dashboard', 'DashboardController::index', ['filter' => 'authGuard
 
 # Dashboard Images
 $routes->GET('/dashboard/images', 'ImageController::index', ['filter' => 'authGuard', 'as' => 'images.index']);
-$routes->POST('/dashboard/images', 'ImageController::upload', ['filter' => 'authGuard', 'as' => 'images.upload']);
+$routes->POST('/dashboard/images/upload', 'ImageController::upload', ['filter' => 'authGuard', 'as' => 'images.upload']);
+$routes->POST('/dashboard/images/upload/event', 'ImageController::uploadImageEvent', ['filter' => 'authGuard', 'as' => 'images.upload.event']);
 $routes->POST('/dashboard/images/update/(:num)', 'ImageController::update/$1', ['filter' => 'authGuard', 'as' => 'images.update']);
 $routes->GET('/dashboard/images/delete/(:num)', 'ImageController::delete/$1', ['filter' => 'authGuard', 'as' => 'images.delete']);
 

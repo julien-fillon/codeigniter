@@ -7,12 +7,12 @@ use App\Enums\ImageCategory;
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uploadModalLabel">Upload an image</h5>
+                <h5 class="modal-title" id="uploadModalLabel">Upload an image fo Event</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
 
             <!-- Upload form-->
-            <?= form_open_multipart(route_to('images.upload')) ?>
+            <?= form_open_multipart(route_to('images.upload.event')) ?>
             <?= csrf_field() ?>
 
             <div class="modal-body">
@@ -42,24 +42,9 @@ use App\Enums\ImageCategory;
                     ]) ?>
                 </div>
 
-                <!-- Dropdown for the category -->
-                <div class="mb-3">
-                    <?= form_label('Category', 'category', ['class' => 'form-label']) ?>
-                    <?= form_dropdown(
-                        'category',
-                        [
-                            '' => 'Select a category',
-                            ImageCategory::EVENT->value => 'Event',
-                            ImageCategory::DATE->value => 'Date'
-                        ],
-                        old('category'),
-                        [
-                            'id' => 'category',
-                            'class' => 'form-select',
-                            'required' => true
-                        ]
-                    ) ?>
-                </div>
+
+                <?= form_hidden('category', ImageCategory::EVENT->value) ?>
+                <?= form_hidden('entity_id', $id) ?>
             </div>
 
             <div class="modal-footer">

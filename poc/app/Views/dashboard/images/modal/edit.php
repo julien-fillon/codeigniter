@@ -1,3 +1,7 @@
+<?php
+
+use App\Enums\ImageCategory;
+?>
 <!-- Edit Modal -->
 <div class="modal fade" id="editModal<?= esc($image['id']) ?>" tabindex="-1" aria-labelledby="editModalLabel<?= esc($image['id']) ?>" aria-hidden="true">
     <div class="modal-dialog">
@@ -9,6 +13,8 @@
 
             <!-- Form -->
             <?= form_open_multipart(route_to('images.update', $image['id'])) ?>
+            <?= csrf_field() ?>
+
             <div class="modal-body">
 
                 <!-- Remote of a new image -->
@@ -41,8 +47,8 @@
                         'category',
                         [
                             '' => 'Select a category',
-                            'event' => 'Event',
-                            'date' => 'Date'
+                            ImageCategory::EVENT->value => 'Event',
+                            ImageCategory::DATE->value => 'Date'
                         ],
                         old('category', $image['category']),
                         [

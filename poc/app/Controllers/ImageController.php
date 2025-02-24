@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Controllers\BaseController;
 use App\Entities\ImageEntity;
+use App\Enums\ImageCategory;
+use App\Services\EventService;
 use App\Services\ImageService;
 use App\Validators\ImageValidator;
 use CodeIgniter\HTTP\RedirectResponse;
@@ -15,12 +17,17 @@ class ImageController extends BaseController
      * @var ImageService $service Service body to manage business logic.
      */
     protected $imageService;
+    /**
+     * @var EventService $service Service body to manage business logic.
+     */
+    protected $eventService;
     protected $redirect = 'images.index';
 
     public function __construct()
     {
         helper(['form', 'url']); // Load the necessary helpers
         $this->imageService = new ImageService();
+        $this->eventService = new EventService();
     }
 
     /**
@@ -49,23 +56,53 @@ class ImageController extends BaseController
         $file = $this->request->getFile('image');
         $name = $this->request->getPost('name');
         $category = $this->request->getPost('category');
-        $entityId = $this->request->getPost('entity_id');
 
         try {
-            $image = $this->imageService->uploadImage($file, $name, $category);
-            if ($image instanceof ImageEntity) {
-                $message = ['success', 'Image uploaded successfully !'];
-                if ($category === ImageEntity::CATEGORY_EVENT && isset($entityId) && $this->imageService->associateImageWithEntity($entityId, $category, $image)) {
-                    return redirect()->route('events.edit', [$entityId])->with($message[0], $message[1]);
-                }
-            } else {
-                $message = ['error', 'An error occurred when uploading the image !'];
-            }
+            $message = $this->imageService->uploadImage($file, $name, $category) ?
+                ['success', 'Image uploaded successfully !'] :
+                ['error', 'An error occurred when uploading the image !'];
         } catch (\Exception $e) {
             $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
         }
 
         return redirect()->route($this->redirect)->with($message[0], $message[1]);
+    }
+
+    /**
+     * Upload a new image event.
+     *
+     * @return \CodeIgniter\HTTP\RedirectResponse
+     */
+    public function uploadImageEvent(): RedirectResponse
+    {
+
+        $message = ['error', 'An error occurred when uploading the image !'];
+
+        if (!$this->validate(ImageValidator::rules())) {
+            return redirect()->back()->withInput()->with('error', implode(' ', $this->validator->getErrors()));
+        }
+
+        $file = $this->request->getFile('image');
+        $name = $this->request->getPost('name');
+        $category = ImageCategory::EVENT->value;
+        $entityId = $this->request->getPost('entity_id');
+
+        try {
+
+            // If the event does not exist returns throw \Exception
+            $event = $this->eventService->getEvent($entityId);
+
+            $image = $this->imageService->uploadImage($file, $name, $category);
+            if ($image instanceof ImageEntity) {
+                $message = $this->imageService->associateImageWithEntity($event, $image) ?
+                    ['success', 'Image associated successfully !'] :
+                    ['error', 'An error occurred when associated the image !'];
+            }
+        } catch (\Exception $e) {
+            $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
+        }
+
+        return redirect()->route('events.edit', [$entityId])->with($message[0], $message[1]);
     }
 
     /**
