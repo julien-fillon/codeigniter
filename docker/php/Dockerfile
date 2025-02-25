@@ -9,30 +9,20 @@ ARG NONROOT_USER=www-data
 ARG PHP_VERSION=83
 ENV PHP_VERSION=${PHP_VERSION}
 
-# Install dependencies and PHP extensions
-# RUN apk add --no-cache \
-#     icu-dev \
-#     libzip-dev \
-#     imagemagick-dev \
-#     shadow \
-#     zlib-dev \
-#     && docker-php-ext-install \
-#     pdo_mysql \
-#     intl \
-#     zip \
-#     && pecl install imagick xdebug \
-#     && docker-php-ext-enable imagick xdebug
-
 RUN apk add --no-cache \
-    imagemagick \
+    php-mysqli \
+    php-pdo_mysql \
+    php-intl \
+    php-pecl-imagick \
+    php-iconv \
+    php-tokenizer \
+    php-session \
+    php-pecl-xdebug \
     # For users permissions
     shadow \
     zip \
-    zlib 
-
-RUN docker-php-ext-configure intl && \
-    docker-php-ext-install \
-    intl
+    zlib \
+    && ln -s /usr/bin/php${PHP_VERSION} 
 
 # add non-root user
 RUN usermod -u 1000 ${NONROOT_USER} \
