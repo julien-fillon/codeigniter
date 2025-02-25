@@ -7,16 +7,19 @@ RUN apk update \
 ARG NONROOT_USER=www-data
 
 RUN apk add --no-cache \
-    apache2 \
-    apache2-proxy \
-    apache2-ssl \
-    apache2-http2 \
+    #apache2 \
+    #apache2-proxy \
+    #apache2-ssl \
+    #apache2-http2 \
     # For users permissions
     shadow 
 
 # add non-root user
 RUN usermod -u 1000 ${NONROOT_USER} \
     && groupmod -g 1000 ${NONROOT_USER}
+
+RUN mkdir -p /var/log/apache2 && \
+    chown -R ${NONROOT_USER}:${NONROOT_USER} /var/log/apache2
 
 # Configuration Apache
 RUN mkdir -p /usr/local/apache2/sites-available /usr/local/apache2/sites-enabled
@@ -31,7 +34,7 @@ WORKDIR /var/www/html
 
 RUN chown -R ${NONROOT_USER}:${NONROOT_USER} /var/www/html
 
-EXPOSE 8480
+#EXPOSE 8480
 
 # Order to start Apache in Foreground mode
 CMD ["httpd", "-D", "FOREGROUND"]

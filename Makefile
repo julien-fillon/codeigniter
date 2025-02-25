@@ -14,6 +14,9 @@ start: # Start codeigniter docker
 build: # Start codeigniter docker
 	docker compose build && docker compose -f docker-compose.yml up -d --remove-orphans
 
+thomas:
+	docker compose up -d --build
+
 start_gitkraken: # Start WSL gitkraken
 	gitkraken &
 
