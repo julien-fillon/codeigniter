@@ -118,7 +118,7 @@ class ImageController extends BaseController
             // Recover the image by ID
             $image = $this->imageService->getImage($id)->toArray();
             // Generate the HTML form (for injection in the modal)
-            $formHtml = view('dashboard/images/modal/edit_form', ['image' => $image]);
+            $formHtml = view('dashboard/images/partial/edit_form', ['image' => $image]);
             return $this->response->setJSON([
                 'success' => true,
                 'html' => $formHtml,

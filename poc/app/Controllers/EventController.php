@@ -151,7 +151,7 @@ class EventController extends BaseController
             $associatedImageIds = array_column($event['images'], 'id');
 
             // Generate HTML for images (improves the Ajax answer)
-            $html = view('dashboard/images/modal/image_list', [
+            $html = view('dashboard/images/partial/image_list', [
                 'images' => $images,
                 'associatedImageIds' => $associatedImageIds,
             ]);
