@@ -124,3 +124,8 @@ nb-configuration.xml
 
 /results/
 /phpunit*.xml
+
+# images upload
+/public/uploads
+/public/qrcodes
+/public/pinfo.php

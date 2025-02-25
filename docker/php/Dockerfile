@@ -4,7 +4,7 @@ RUN apk update; \
     apk upgrade;
 
 # Debian args
-ARG NONROOT_USER=codeigniter
+ARG NONROOT_USER=www-data
 
 ARG PHP_VERSION=83
 ENV PHP_VERSION=${PHP_VERSION}
@@ -16,6 +16,7 @@ RUN apk add --no-cache \
     apache2-ssl \
     apache2-http2 \
     curl \
+    imagemagick \
     php${PHP_VERSION} \
     php${PHP_VERSION}-apache2 \
     php${PHP_VERSION}-cli \
@@ -30,6 +31,10 @@ RUN apk add --no-cache \
     php${PHP_VERSION}-xml \
     php${PHP_VERSION}-zip \
     php${PHP_VERSION}-tokenizer \
+    php${PHP_VERSION}-ctype \
+    php${PHP_VERSION}-session \
+    php${PHP_VERSION}-pecl-imagick \
+    php${PHP_VERSION}-iconv \
     # Xdebug
     php${PHP_VERSION}-pecl-xdebug \
     # For users permissions
@@ -41,8 +46,7 @@ RUN apk add --no-cache \
     && chown -R apache:apache /var/www/html
 
 # add non-root user
-RUN groupadd -g 1000 ${NONROOT_USER} \
-    && useradd -r -u 1000 -g ${NONROOT_USER} ${NONROOT_USER} \
+RUN useradd -r -u 1000 -g ${NONROOT_USER} ${NONROOT_USER} \
     && usermod -u 1000 ${NONROOT_USER} \
     && groupmod -g 1000 ${NONROOT_USER}
 
