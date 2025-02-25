@@ -31,14 +31,26 @@ services:
       - mariadb_network
       - codeigniter_network
 
-  codeigniter:
-    build: ./docker/php
-    container_name: codeigniter
-    restart: always
+  apache:
+    build: ./docker/apache
     ports:
       - "8480:80"
     volumes:
       - ./poc:/var/www/html:delegated
+      - phpsocket:/var/run:delegated
+    depends_on:
+      - php
+    networks:
+      - codeigniter_network
+
+  php:
+    build: ./docker/php
+    container_name: php
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./poc:/var/www/html:delegated
+      - phpsocket:/var/run:delegated
     networks:
       - codeigniter_network
     extra_hosts:
@@ -47,6 +59,7 @@ services:
 # Volumes
 volumes:
   mariadb_data:
+  phpsocket:
 
 # Networks
 networks:
