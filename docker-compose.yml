@@ -1,9 +1,8 @@
 services:
   mariadb:
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      SERVICE_NAME: mariadb
+      MYSQL_ROOT_PASSWORD: kiA19h11nq9t6HCb
+      MYSQL_DATABASE: crystal_event
     build: ./docker/mariadb/
     container_name: mariadb
     security_opt:
@@ -31,14 +30,26 @@ services:
       - mariadb_network
       - codeigniter_network
 
-  codeigniter:
-    build: ./docker/php
-    container_name: codeigniter
-    restart: always
+  apache:
+    build: ./docker/apache
+    container_name: apache_codeigniter
     ports:
       - "8480:80"
     volumes:
       - ./poc:/var/www/html:delegated
+      - phpsocket_codeigniter:/var/run:delegated
+    depends_on:
+      - php
+    networks:
+      - codeigniter_network
+  php:
+    build: ./docker/php
+    container_name: php_codeigniter
+    ports:
+      - "9009:9000"
+    volumes:
+      - ./poc:/var/www/html:delegated
+      - phpsocket_codeigniter:/var/run:delegated
     networks:
       - codeigniter_network
     extra_hosts:
@@ -47,6 +58,7 @@ services:
 # Volumes
 volumes:
   mariadb_data:
+  phpsocket_codeigniter:
 
 # Networks
 networks:
