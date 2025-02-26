@@ -7,7 +7,6 @@ RUN apk update \
 ARG NONROOT_USER=www-data
 
 RUN apk add --no-cache \
-    #apache2 \
     #apache2-proxy \
     #apache2-ssl \
     #apache2-http2 \
@@ -33,8 +32,6 @@ RUN ln -s /usr/local/apache2/sites-available/codeigniter.conf /usr/local/apache2
 WORKDIR /var/www/html
 
 RUN chown -R ${NONROOT_USER}:${NONROOT_USER} /var/www/html
-
-#EXPOSE 8480
 
 # Order to start Apache in Foreground mode
 CMD ["httpd", "-D", "FOREGROUND"]

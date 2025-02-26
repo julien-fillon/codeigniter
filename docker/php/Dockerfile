@@ -10,20 +10,19 @@ ARG PHP_VERSION=83
 ENV PHP_VERSION=${PHP_VERSION}
 
 RUN apk add --no-cache \
+    libpng-dev \
+    libwebp-dev \
     linux-headers \
     icu-dev \
     zlib-dev \ 
     curl \
-    #php-mysqli \
     php-pdo_mysql \
-    #php-intl \
     libzip-dev \
     libxml2-dev \
-    php-pecl-imagick \
     php-iconv \
     php-ctype \
     php-dom \
-    #php-pecl-xdebug \
+    php-gd \
     # For users permissions
     shadow \
     zip \
@@ -32,13 +31,24 @@ RUN apk add --no-cache \
     nano \
     autoconf \
     g++ \
-    make
-
-    # && ln -s /usr/bin/php${PHP_VERSION} 
+    make \
+    imagemagick \
+    imagemagick-dev
 
 RUN pecl install xdebug \ 
     docker-php-ext-enable xdebug \
     && docker-php-ext-install intl mysqli
+
+# if use imagick
+# Installation propre d'Imagick via PECL
+RUN pecl install imagick \
+    && docker-php-ext-enable imagick \
+    # Parce que docker-php-ext-enable imagick ne parvient pas à activer extension=imagick.so dans php.ini
+    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/imagick.ini
+
+# if use gd
+RUN docker-php-ext-configure gd --with-webp && \
+    docker-php-ext-install gd
 
 # add non-root user
 RUN usermod -u 1000 ${NONROOT_USER} \

@@ -28,4 +28,12 @@ class Images extends BaseConfig
         'gd'      => GDHandler::class,
         'imagick' => ImageMagickHandler::class,
     ];
+
+    public function __construct()
+    {
+        parent::__construct();
+
+        $this->defaultHandler = env('IMAGE_HANDLER', 'gd'); // Défaut: gd
+        $this->libraryPath = env('IMAGE_LIBRARY_PATH', '/usr/bin/convert'); // Défaut: /usr/bin/convert
+    }
 }
