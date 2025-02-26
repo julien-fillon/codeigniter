@@ -33,7 +33,8 @@ RUN apk add --no-cache \
     g++ \
     make \
     imagemagick \
-    imagemagick-dev
+    imagemagick-dev \
+    composer
 
 RUN pecl install xdebug \ 
     docker-php-ext-enable xdebug \
@@ -43,8 +44,8 @@ RUN pecl install xdebug \
 # Installation propre d'Imagick via PECL
 RUN pecl install imagick \
     && docker-php-ext-enable imagick \
-    # Parce que docker-php-ext-enable imagick ne parvient pas à activer extension=imagick.so dans php.ini
-    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/imagick.ini
+    # remplace extension=imagick par extension=imagick.so dans php.ini
+    && echo "extension=imagick.so" > /usr/local/etc/php/conf.d/docker-php-ext-imagick.ini
 
 # if use gd
 RUN docker-php-ext-configure gd --with-webp && \
@@ -62,9 +63,15 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 RUN chown -R ${NONROOT_USER}:${NONROOT_USER} /var/www/html
 
+COPY --link ./startup.sh /usr/local/bin/startup.sh
+
+RUN chmod +x /usr/local/bin/startup.sh
+
 # Defines the work directory
 WORKDIR /var/www/html
 
 EXPOSE 9000
 
-CMD [ "php-fpm", "-F" ]
+USER ${NONROOT_USER}
+
+CMD ["sh", "-c", "sh /usr/local/bin/startup.sh & php-fpm -F"]
