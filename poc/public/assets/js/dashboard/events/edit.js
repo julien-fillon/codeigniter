@@ -49,57 +49,58 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.querySelector('#saveDateSelectedImage').addEventListener('click', function () {   
-        // Récupère l'image sélectionnée (input radio checked)
         const selectedRadio = document.querySelector('#image-list input[name="selected_image"]:checked');
 
         if (!selectedRadio) {
             alert('Please select an image.');
-            return; // Stop execution if no image is selected
+            return; 
         }
 
-        // Récupère l'ID de l'image sélectionnée
+        //Recover the selected image ID
         const selectedImageId = selectedRadio.value;
 
-        // Met à jour le champ caché `image_id` dans le formulaire
+        // Updates the hidden field `Image_id` in the form
         const hiddenInput = document.querySelector('input[name="image_id"]');
         if (hiddenInput) {
             hiddenInput.value = selectedImageId;
         }
 
-        // Met à jour l'aperçu de l'image sélectionnée
+        // Updates the selected image preview
         const selectedImagePreview = document.querySelector('#selectedImagePreview');
-        const selectedImageCard = selectedRadio.closest('.card'); // Récupère la carte parente
+        const selectedImageCard = selectedRadio.closest('.card');
         if (selectedImagePreview && selectedImageCard) {
-            const imgElement = selectedImageCard.querySelector('img'); // Récupère l'élément img
-            selectedImagePreview.src = imgElement.src; // Met à jour l'aperçu
-            selectedImagePreview.style.display = 'block'; // Affiche l'aperçu
+            const imgElement = selectedImageCard.querySelector('img')
+            selectedImagePreview.src = imgElement.src;
+            selectedImagePreview.style.display = 'block';
         }
 
-
-        // Ferme le modal
+        // Close modal
         const imageDateSelectorModal = bootstrap.Modal.getInstance(document.getElementById('imageDateSelectorModal'));
         if (imageDateSelectorModal) {
             imageDateSelectorModal.hide();
         }
     });
 
-    // Triggered event each time a button opening the modal is clicked
-    document.querySelectorAll('button.image_selector_modal').forEach(button => {
-        button.addEventListener('click', function () {
-            const modalId = this.getAttribute('data-bs-target');
-            const loadUrl = this.getAttribute('data-load-url'); 
-            const context = this.getAttribute('data-context'); 
+    // Attach an event listened to the document (or a static parent)
+    document.addEventListener('click', function (event) {
+        // Check if the clicked item is a button with the Image_Selector_Modal class
+        if (event.target && event.target.matches('button.image_selector_modal')) {
+
+            const button = event.target; // The clicked button
+            const modalId = button.getAttribute('data-bs-target');
+            const loadUrl = button.getAttribute('data-load-url');
+            const context = button.getAttribute('data-context');
 
             const modalTitle = document.getElementById('imageSelectorModalLabel');
             modalTitle.textContent = context === 'event' ? 'Select Image for Event' : 'Select Image for Date';
 
-            const modalElement = document.querySelector(modalId); 
+            const modalElement = document.querySelector(modalId);
             const imageContainer = modalElement.querySelector('.modal-body .row');
 
             // Displays a default loading message
             imageContainer.innerHTML = '<p class="text-center">Loading images...</p>';
 
-            // Ajax request to load images from loadurl
+            // Ajax request to load images from Loadurl
             fetch(loadUrl, {
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest',
@@ -117,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 console.error('Error when loading images :', error);
                 imageContainer.innerHTML = '<p>An error occurred while loading images.</p>';
             });
-        });
+        }
     });
 
     // Event earphone on a parent container
@@ -125,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function () {
         // Check if the target element is an image with the "Img-Thumbnail" class
         if (e.target && e.target.classList.contains('img-thumbnail')) {
             const fetchUrl = e.target.getAttribute('data-url'); // Récupération de l'URL
-            console.log(fetchUrl);
 
             // Modal recovery and loading message
             const modalBody = document.querySelector('#editModal .modal-body');
@@ -166,8 +166,6 @@ document.addEventListener('DOMContentLoaded', function () {
             // URL recovered from the attribute of the item (dynamic option)
             const fetchUrl = this.getAttribute('data-url'); // L'URL de la route de l'image
 
-            console.log(fetchUrl);
-
             // Recover the modal item and insert a loading message
             const modalBody = document.querySelector('#dateEditModal .modal-body');
             modalBody.innerHTML = '<p>Loading in progress ...</p>';
@@ -178,19 +176,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     'X-Requested-With': 'XMLHttpRequest', //Indicate that the request is Ajax
                 },
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Insert the form returned by the server in the modalbody`
-                        modalBody.innerHTML = data.html;
-                    } else {
-                        modalBody.innerHTML = '<p>Unable to recover data from the date.</p>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error when recovering data :', error);
-                    modalBody.innerHTML = '<p>An error occurred. Please try again.</p>';
-                });
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Insert the form returned by the server in the modalbody`
+                    modalBody.innerHTML = data.html;
+                } else {
+                    modalBody.innerHTML = '<p>Unable to recover data from the date.</p>';
+                }
+            })
+            .catch(error => {
+                console.error('Error when recovering data :', error);
+                modalBody.innerHTML = '<p>An error occurred. Please try again.</p>';
+            });
 
             // Display the modal
             const modal = new bootstrap.Modal(document.getElementById('dateEditModal'));
@@ -200,11 +198,27 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function openChildModal() {
-    // Affiche la modale enfant avec backdrop statique
+    // Opens the children's modal with a static backdrop
     var childModal = new bootstrap.Modal(
         document.getElementById('imageDateSelectorModal'), {
             backdrop: "static"
         }
     );
+
+    // Poster the modal
     childModal.show();
+
+    // Optional: Force the modal in the foreground by adjusting its Zndex
+    const modalElement = document.getElementById('imageDateSelectorModal');
+    if (modalElement) {
+        // Find the highest Z-INNEX currently in the DOM
+        const highestZIndex = Math.max(
+            ...Array.from(document.querySelectorAll('body *')).map(el =>
+                parseFloat(window.getComputedStyle(el).zIndex)
+            ).filter(zIndex => !isNaN(zIndex))
+        );
+
+        // Apply a higher Z-INDEX to the modal
+        modalElement.style.zIndex = highestZIndex + 1;
+    }
 }
