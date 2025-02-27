@@ -46,12 +46,67 @@
             </div>
 
             <!-- Button to open the modal -->
-            <button type="button" class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#imageSelectorModal" data-load-url="<?= route_to('events.load_images', $event['id']) ?>">
+            <button type="button" class="btn btn-secondary mt-3 image_selector_modal" data-bs-toggle="modal" data-bs-target="#imageEventSelectorModal" data-load-url="<?= route_to('events.load_images', $event['id']) ?>" data-context="event">
                 Select Images
             </button>
 
-            <?= view('dashboard/images/modal/list', ['id' => $event['id']]); ?>
-            <?= view('dashboard/images/modal/event/upload', ['id' => $event['id']]); ?>
+            <?= view('dashboard/images/modal/list', [
+                'target' => 'uploadEventModal',
+                'modalId' => 'imageEventSelectorModal',
+                'saveId' => 'saveEventSelectedImages',
+                'route' => route_to('events.attach_images', $event['id'])
+            ]); ?>
+            <?= view('dashboard/images/modal/events/upload', ['id' => $event['id']]); ?>
+        </div>
+
+        <!-- List of associated dates -->
+        <div class="mb-3 mt-3">
+            <h4>Associated Dates</h4>
+
+            <?php if (!empty($event['dates'])): ?>
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Date</th>
+                            <th>Location</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($event['dates'] as $index => $date): ?>
+                            <tr>
+                                <td><?= $index + 1; ?></td>
+                                <td><?= esc($date->date); ?></td>
+                                <td><?= esc($date->location); ?></td>
+                                <td>
+                                    <!-- Modify button -->
+                                    <button type="button" class="btn btn-warning btn-sm btn-edit" data-url="<?= route_to('dates.edit', $date->id); ?>">
+                                        Edit
+                                    </button>
+
+                                    <!-- Delete button -->
+                                    <a href="<?= route_to('dates.delete', $date->id) ?>"
+                                        class="btn btn-danger btn-sm"
+                                        onclick="return confirm('Are you sure you want to delete this date?')">
+                                        Delete
+                                    </a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            <?php else: ?>
+                <p>No dates associated with this event.</p>
+            <?php endif; ?>
+
+            <!-- Button to open the 'Add Date' modal -->
+            <button type="button" class="btn btn-secondary mt-3" data-bs-toggle="modal" data-bs-target="#dateAddModal">
+                Add New Date
+            </button>
+
+            <?= view('dashboard/dates/modal/create'); ?>
+            <?= view('dashboard/dates/modal/edit'); ?>
         </div>
 
         <?= form_open(route_to('events.update', $event['id'])) ?>

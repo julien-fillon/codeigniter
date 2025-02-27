@@ -6,11 +6,8 @@ document.addEventListener('DOMContentLoaded', function () {
     editButtons.forEach(button => {
         button.addEventListener('click', function () {
 
-            console.log(this);
             // URL recovered from the attribute of the item (dynamic option)
-            const fetchUrl = this.getAttribute('data-url'); // L'URL de la route de l'image
-
-            console.log(fetchUrl);
+            const fetchUrl = this.getAttribute('data-url'); // The url of the image road
 
             // Recover the modal item and insert a loading message
             const modalBody = document.querySelector('#editModal .modal-body');

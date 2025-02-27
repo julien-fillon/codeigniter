@@ -24,7 +24,7 @@ class UserRepository
      *
      * @param int $id
      * @return UserEntity|null The user data, or null if not found.
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function findUserByEmail(string $email): UserEntity|null
     {
