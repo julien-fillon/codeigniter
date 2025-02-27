@@ -81,7 +81,9 @@
                                 <td><?= esc($date->location); ?></td>
                                 <td>
                                     <!-- Modify button -->
-                                    <a href="<?= route_to('dates.edit', $date->id) ?>" class="btn btn-warning btn-sm">Edit</a>
+                                    <button type="button" class="btn btn-warning btn-sm btn-edit" data-bs-toggle="modal" data-url="<?= route_to('dates.edit', $date->id); ?>">
+                                        Edit
+                                    </button>
 
                                     <!-- Delete button -->
                                     <a href="<?= route_to('dates.delete', $date->id) ?>"
@@ -104,6 +106,7 @@
             </button>
 
             <?= view('dashboard/dates/modal/create'); ?>
+            <?= view('dashboard/dates/modal/edit'); ?>
         </div>
 
         <?= form_open(route_to('events.update', $event['id'])) ?>

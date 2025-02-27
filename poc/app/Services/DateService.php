@@ -43,7 +43,7 @@ class DateService
             }
 
             // Image associated with the date
-            $date->images = $date->getImage();
+            $date->image = $date->getImage();
 
             return $date;
         } catch (\Exception $e) {

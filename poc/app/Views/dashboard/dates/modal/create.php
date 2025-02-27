@@ -58,6 +58,5 @@
 <?= view('dashboard/images/modal/list', [
     'target' => 'uploadDateModal',
     'modalId' => 'imageDateSelectorModal',
-    'saveId' => 'saveDateSelectedImage',
-    'route' => route_to('dates.attach_images')
+    'saveId' => 'saveDateSelectedImage'
 ]); ?>
