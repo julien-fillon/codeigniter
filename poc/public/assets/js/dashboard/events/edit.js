@@ -60,18 +60,23 @@ document.addEventListener('DOMContentLoaded', function () {
         const selectedImageId = selectedRadio.value;
 
         // Updates the hidden field `Image_id` in the form
-        const hiddenInput = document.querySelector('input[name="image_id"]');
-        if (hiddenInput) {
+        const hiddenInputs = document.querySelectorAll('input[name="image_id"]');
+        hiddenInputs.forEach(hiddenInput => {
             hiddenInput.value = selectedImageId;
-        }
+        });
 
         // Updates the selected image preview
-        const selectedImagePreview = document.querySelector('#selectedImagePreview');
+        const selectedImagePreviews = document.querySelectorAll('#selectedImagePreview');
         const selectedImageCard = selectedRadio.closest('.card');
-        if (selectedImagePreview && selectedImageCard) {
-            const imgElement = selectedImageCard.querySelector('img')
-            selectedImagePreview.src = imgElement.src;
-            selectedImagePreview.style.display = 'block';
+        if (selectedImageCard && selectedImagePreviews) {
+            const imgElement = selectedImageCard.querySelector('img');
+        
+            selectedImagePreviews.forEach(selectedImagePreview => {
+                if (imgElement) {
+                    selectedImagePreview.src = imgElement.src;
+                    selectedImagePreview.style.display = 'block';
+                }
+            });
         }
 
         // Close modal
@@ -198,20 +203,21 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function openChildModal() {
-    // Opens the children's modal with a static backdrop
-    var childModal = new bootstrap.Modal(
-        document.getElementById('imageDateSelectorModal'), {
-            backdrop: "static"
-        }
-    );
-
-    // Poster the modal
-    childModal.show();
 
     // Optional: Force the modal in the foreground by adjusting its Zndex
     const modalElement = document.getElementById('imageDateSelectorModal');
     if (modalElement) {
-        // Find the highest Z-INNEX currently in the DOM
+        // Opens the children's modal with a static backdrop
+        let childModal = new bootstrap.Modal(
+            modalElement, {
+                backdrop: "static"
+            }
+        );
+
+        // Poster the modal
+        childModal.show();
+
+        // Find the highest Z-INDEX currently in the DOM
         const highestZIndex = Math.max(
             ...Array.from(document.querySelectorAll('body *')).map(el =>
                 parseFloat(window.getComputedStyle(el).zIndex)

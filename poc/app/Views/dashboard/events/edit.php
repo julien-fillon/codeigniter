@@ -81,7 +81,7 @@
                                 <td><?= esc($date->location); ?></td>
                                 <td>
                                     <!-- Modify button -->
-                                    <button type="button" class="btn btn-warning btn-sm btn-edit" data-bs-toggle="modal" data-url="<?= route_to('dates.edit', $date->id); ?>">
+                                    <button type="button" class="btn btn-warning btn-sm btn-edit" data-url="<?= route_to('dates.edit', $date->id); ?>">
                                         Edit
                                     </button>
 
