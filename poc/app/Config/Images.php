@@ -33,7 +33,7 @@ class Images extends BaseConfig
     {
         parent::__construct();
 
-        $this->defaultHandler = env('IMAGE_HANDLER', 'gd'); // Défaut: gd
-        $this->libraryPath = env('IMAGE_LIBRARY_PATH', '/usr/bin/convert'); // Défaut: /usr/bin/convert
+        $this->defaultHandler = env('IMAGE_HANDLER', 'gd');
+        $this->libraryPath = env('IMAGE_LIBRARY_PATH', '/usr/local/bin/convert');
     }
 }

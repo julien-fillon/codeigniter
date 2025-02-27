@@ -6,7 +6,6 @@ use App\Controllers\BaseController;
 use App\Services\EventService;
 use App\Services\ImageService;
 use App\Validators\EventValidator;
-use App\Entities\ImageEntity;
 use App\Enums\ImageCategory;
 use CodeIgniter\HTTP\RedirectResponse;
 use CodeIgniter\HTTP\ResponseInterface;
@@ -81,9 +80,10 @@ class EventController extends BaseController
     public function edit(int $id): string|RedirectResponse
     {
         try {
-            $data['event'] = $this->eventService->getEvent($id)->toArray();
-            $data['entity_type'] = ImageCategory::EVENT->value;
-            return view('dashboard/events/edit', $data);
+            $datas['event'] = $this->eventService->getEvent($id)->toArray();
+            $datas['entity_type'] = ImageCategory::EVENT->value;
+
+            return view('dashboard/events/edit', $datas);
         } catch (\RuntimeException $e) {
             return redirect()->back()->with('error', $e->getMessage());
         }
@@ -151,7 +151,7 @@ class EventController extends BaseController
             $associatedImageIds = array_column($event['images'], 'id');
 
             // Generate HTML for images (improves the Ajax answer)
-            $html = view('dashboard/images/partial/image_list', [
+            $html = view('dashboard/images/partial/events/image_list', [
                 'images' => $images,
                 'associatedImageIds' => $associatedImageIds,
             ]);

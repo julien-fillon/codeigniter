@@ -3,16 +3,16 @@
 use App\Enums\ImageCategory;
 ?>
 <!-- Upload Modal -->
-<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+<div class="modal fade" id="uploadDateModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="uploadModalLabel">Upload an image fo Event</h5>
+                <h5 class="modal-title" id="uploadModalLabel">Upload an image for Date</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
 
             <!-- Upload form-->
-            <?= form_open_multipart(route_to('images.upload.event')) ?>
+            <?= form_open_multipart(route_to('images.upload.date')) ?>
             <?= csrf_field() ?>
 
             <div class="modal-body">
@@ -43,8 +43,7 @@ use App\Enums\ImageCategory;
                 </div>
 
 
-                <?= form_hidden('category', ImageCategory::EVENT->value) ?>
-                <?= form_hidden('entity_id', $id) ?>
+                <?= form_hidden('category', ImageCategory::DATE->value) ?>
             </div>
 
             <div class="modal-footer">

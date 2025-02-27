@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Entities\DateEntity;
 use App\Entities\EventEntity;
 use App\Entities\ImageEntity;
 use App\Enums\ImageCategory;
@@ -25,7 +26,7 @@ class EventRepository
      * List events
      *
      * @return array<EventEntity>|null The list of events.
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function findAll(): array|null
     {
@@ -43,7 +44,7 @@ class EventRepository
      *
      * @param int $id
      * @return EventEntity|null The event data, or null if not found.
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function findById(int $id): EventEntity|null
     {
@@ -61,7 +62,7 @@ class EventRepository
      *
      * @param EventEntity $event
      * @return bool True in case of success, false if not.
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function create(EventEntity $event): bool
     {
@@ -79,7 +80,7 @@ class EventRepository
      *
      * @param EventEntity $event
      * @return bool True in case of success, false if not.
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function update(EventEntity $event): bool
     {
@@ -97,7 +98,7 @@ class EventRepository
      *
      * @param EventEntity $event
      * @return bool True in case of success, false if not.
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function delete(EventEntity $event): bool
     {
@@ -115,27 +116,34 @@ class EventRepository
      *
      * @param EventEntity $event
      * @param array<ImageEntity> $images
+     * @throws DatabaseException
      */
     public function attachImages(EventEntity $event, array $images): void
     {
-        $db = db_connect();
-        $builder = $db->table('event_images');
+        try {
+            $db = db_connect();
+            $builder = $db->table('event_images');
 
-        // Deletes old associations
-        $builder->where('event_id', $event->id)->delete();
+            // Deletes old associations
+            $builder->where('event_id', $event->id)->delete();
 
-        // Add the new associations
-        $data = [];
-        if (!empty($images)) {
-            foreach ($images as $image) {
-                $data[] = [
-                    'event_id' => $event->id,
-                    'image_id' => $image->id,
-                    'created_at' => date('Y-m-d H:i:s'),
-                ];
+            // Add the new associations
+            $data = [];
+            if (!empty($images)) {
+                foreach ($images as $image) {
+                    $data[] = [
+                        'event_id' => $event->id,
+                        'image_id' => $image->id,
+                        'created_at' => date('Y-m-d H:i:s'),
+                    ];
+                }
+
+                $builder->insertBatch($data);
             }
-
-            $builder->insertBatch($data);
+        } catch (\Exception $e) {
+            $message = 'Error attach image the event with ID ' . $event->id . ': ' . $e->getMessage();
+            log_message('error', $message);
+            throw new DatabaseException($message);
         }
     }
 
@@ -144,33 +152,43 @@ class EventRepository
      *
      * @param EventEntity $event
      * @return array
+     * @throws DatabaseException
      */
     public function findImagesByEvent(EventEntity $event): array
     {
-        $db = db_connect();
-        $builder = $db->table('event_images');
-        $builder->select('images.*');
-        $builder->join('images', 'images.id = event_images.image_id');
-        $builder->where('event_images.event_id', $event->id);
-        $builder->where('images.category', ImageCategory::EVENT->value);
+        try {
+            $db = db_connect();
+            $builder = $db->table('event_images');
+            $builder->select('images.*');
+            $builder->join('images', 'images.id = event_images.image_id');
+            $builder->where('event_images.event_id', $event->id);
+            $builder->where('images.category', ImageCategory::EVENT->value);
 
-        return $builder->get()->getResultArray();
+            return $builder->get()->getResultArray();
+        } catch (\Exception $e) {
+            $message = 'Error finding the image event with ID ' . $event->id . ': ' . $e->getMessage();
+            log_message('error', $message);
+            throw new DatabaseException($message);
+        }
     }
 
     /**
-     * Recovers all events related to an image.
+     * Recovers all dates linked to an event
      *
-     * @param ImageEntity $image
-     * @return array
+     * @param EventEntity $eventId
+     * @return DateEntity[]
+     * @throws DatabaseException
      */
-    public function findEventsByImageId(ImageEntity $image): array
+    public function findDatesForEvent(EventEntity $event): array
     {
-        $db = db_connect();
-        $builder = $db->table('event_images');
-        $builder->select('events.*');
-        $builder->join('events', 'events.id = event_images.event_id');
-        $builder->where('event_images.image_id', $image->id);
-
-        return $builder->get()->getResultArray();
+        try {
+            $builder = db_connect()->table('dates');
+            $builder->where('event_id', $event->id);
+            return $builder->get()->getResultObject(DateEntity::class);
+        } catch (\Exception $e) {
+            $message = 'Error finding the date event with ID ' . $event->id . ': ' . $e->getMessage();
+            log_message('error', $message);
+            throw new DatabaseException($message);
+        }
     }
 }

@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Button to save the selected images
-    document.querySelector('#save-selected-images').addEventListener('click', function () {
+    document.querySelector('#saveEventSelectedImages').addEventListener('click', function () {
         // Recover all the selected images
         const selectedImages = Array.from(
             document.querySelectorAll(
@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ).map(input => input.value);
 
         // Dynamic URL recovery via the data-* attributes
-        const saveUrl = document.querySelector('#save-selected-images').getAttribute('data-save-url');
+        const saveUrl = document.querySelector('#saveEventSelectedImages').getAttribute('data-save-url');
         const csrfTokenName = document.querySelector('meta[name="csrf-token-name"]').getAttribute('content');
         const csrfHash = document.querySelector('meta[name="csrf-hash"]').getAttribute('content');
 
@@ -25,59 +25,99 @@ document.addEventListener('DOMContentLoaded', function () {
                 image_ids: selectedImages
             }),
         })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update of the list of images associated in the DOM
-                    const associatedImagesContainer = document.querySelector('#associated-images');
-                    associatedImagesContainer.innerHTML = '';
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Update of the list of images associated in the DOM
+                const associatedImagesContainer = document.querySelector('#associated-images');
+                associatedImagesContainer.innerHTML = '';
 
-                    data.images.forEach(image => {
-                        associatedImagesContainer.innerHTML += `
-                        <div class="col-md-1 mb-3">
-                            <img src="${image.path}" alt="${image.name}" class="img-thumbnail">
-                        </div>
-                    `;
-                    });
+                data.images.forEach(image => {
+                    associatedImagesContainer.innerHTML += `
+                    <div class="col-md-1 mb-3">
+                        <img src="${image.path}" alt="${image.name}" class="img-thumbnail">
+                    </div>
+                `;
+                });
 
-                    // Close modal
-                    const modal = document.querySelector('#imageSelectorModal');
-                    const bootstrapModal = bootstrap.Modal.getInstance(modal);
-                    bootstrapModal.hide();
-
-                }
-            })
-            .catch(error => {
-                console.error(error);
-                alert('An error occurred. Please try again.');
-            });
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            alert('An error occurred. Please try again.');
+        });
     });
 
-    // Click management on the button to open the modal
-    document.querySelector('[data-bs-target="#imageSelectorModal"]').addEventListener('click', function () {
-        const modalBody = document.querySelector('#image-list');
-        modalBody.innerHTML = '<p>Loading images...</p>'; // Indicates that the images are being loaded
+    document.querySelector('#saveDateSelectedImage').addEventListener('click', function () {   
+        // Récupère l'image sélectionnée (input radio checked)
+        const selectedRadio = document.querySelector('#image-list input[name="selected_image"]:checked');
 
-        // Dynamically load images via Ajax
-        const loadUrl = document.querySelector('[data-bs-target="#imageSelectorModal"]').getAttribute('data-load-url');
+        if (!selectedRadio) {
+            alert('Please select an image.');
+            return; // Stop execution if no image is selected
+        }
 
-        fetch(loadUrl, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-        })
+        // Récupère l'ID de l'image sélectionnée
+        const selectedImageId = selectedRadio.value;
+
+        // Met à jour le champ caché `image_id` dans le formulaire
+        const hiddenInput = document.querySelector('input[name="image_id"]');
+        if (hiddenInput) {
+            hiddenInput.value = selectedImageId;
+        }
+
+        // Met à jour l'aperçu de l'image sélectionnée
+        const selectedImagePreview = document.querySelector('#selectedImagePreview');
+        const selectedImageCard = selectedRadio.closest('.card'); // Récupère la carte parente
+        if (selectedImagePreview && selectedImageCard) {
+            const imgElement = selectedImageCard.querySelector('img'); // Récupère l'élément img
+            selectedImagePreview.src = imgElement.src; // Met à jour l'aperçu
+            selectedImagePreview.style.display = 'block'; // Affiche l'aperçu
+        }
+
+
+        // Ferme le modal
+        const imageDateSelectorModal = bootstrap.Modal.getInstance(document.getElementById('imageDateSelectorModal'));
+        if (imageDateSelectorModal) {
+            imageDateSelectorModal.hide();
+        }
+    });
+
+    // Triggered event each time a button opening the modal is clicked
+    document.querySelectorAll('button.image_selector_modal').forEach(button => {
+        button.addEventListener('click', function () {
+            const modalId = this.getAttribute('data-bs-target');
+            const loadUrl = this.getAttribute('data-load-url'); 
+            const context = this.getAttribute('data-context'); 
+
+            const modalTitle = document.getElementById('imageSelectorModalLabel');
+            modalTitle.textContent = context === 'event' ? 'Select Image for Event' : 'Select Image for Date';
+
+            const modalElement = document.querySelector(modalId); 
+            const imageContainer = modalElement.querySelector('.modal-body .row');
+
+            // Displays a default loading message
+            imageContainer.innerHTML = '<p class="text-center">Loading images...</p>';
+
+            // Ajax request to load images from loadurl
+            fetch(loadUrl, {
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            })
             .then(response => response.json())
             .then(data => {
                 if (data.success && data.html) {
-                    modalBody.innerHTML = data.html; // Insert the HTML received from the server
+                    imageContainer.innerHTML = data.html; // Insert the HTML received from the server
                 } else {
-                    modalBody.innerHTML = '<p>Failed to load images. Please try again later.</p>';
+                    imageContainer.innerHTML = '<p>Failed to load images. Please try again later.</p>';
                 }
             })
             .catch(error => {
                 console.error('Error when loading images :', error);
-                modalBody.innerHTML = '<p>An error occurred while loading images.</p>';
+                imageContainer.innerHTML = '<p>An error occurred while loading images.</p>';
             });
+        });
     });
 
     // Event earphone on a parent container
@@ -102,12 +142,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data.success) {
                         modalBody.innerHTML = data.html;
                     } else {
-                        modalBody.innerHTML = '<p>Impossible de récupérer les données.</p>';
+                        modalBody.innerHTML = '<p>Unable to recover the data.</p>';
                     }
                 })
                 .catch(error => {
-                    console.error('Erreur lors de la récupération des données :', error);
-                    modalBody.innerHTML = '<p>Une erreur est survenue.</p>';
+                    console.error('Error when recovering data :', error);
+                    modalBody.innerHTML = '<p>An error occurred.</p>';
                 });
 
             // Modal display
@@ -116,3 +156,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 });
+
+function openChildModal() {
+    // Affiche la modale enfant avec backdrop statique
+    var childModal = new bootstrap.Modal(
+        document.getElementById('imageDateSelectorModal'), {
+            backdrop: "static"
+        }
+    );
+    childModal.show();
+}

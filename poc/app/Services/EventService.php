@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Entities\EventEntity;
+use App\Repositories\DateRepository;
 use App\Repositories\EventRepository;
 use App\Repositories\ImageRepository;
 use Config\Database;
@@ -19,12 +20,14 @@ class EventService
 
     protected $eventRepo;
     protected $imageRepo;
+    protected $dateRepo;
     protected $db;
 
     public function __construct()
     {
         $this->eventRepo = new EventRepository();
         $this->imageRepo = new ImageRepository();
+        $this->dateRepo = new DateRepository();
         $this->db = Database::connect();
     }
 
@@ -76,6 +79,7 @@ class EventService
 
             // Image associated with the event
             $event->images = $this->eventRepo->findImagesByEvent($event);
+            $event->dates = $this->eventRepo->findDatesForEvent($event);
 
             return $event;
         } catch (\Exception $e) {
@@ -155,7 +159,6 @@ class EventService
 
             $datas['slug'] = $this->generateSlug($datas, 'slug', 'event_name');
 
-            $datas['created_at'] = date('Y-m-d H:i:s');
             $datas['updated_at'] = date('Y-m-d H:i:s');
 
             $event->fill($datas);

@@ -23,7 +23,7 @@ class ImageRepository
      * List images
      *
      * @return array<ImageEntity>|null The list of images.
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function findAll(): array|null
     {
@@ -41,7 +41,7 @@ class ImageRepository
      *
      * @param  string $category
      * @return array<ImageEntity>|null The list of images.
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function findByCategory(string $category): array|null
     {
@@ -61,7 +61,7 @@ class ImageRepository
      *
      * @param int $id
      * @return ImageEntity|null The image data, or null if not found.
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function findById(int $id): ImageEntity|null
     {
@@ -79,6 +79,7 @@ class ImageRepository
      *
      * @param array $imageIds List of IDS of images to recover.
      * @return array<ImageEntity> List of images in the form of Array.
+     * @throws DatabaseException
      */
     public function findByIds(array $imageIds): array
     {
@@ -103,7 +104,7 @@ class ImageRepository
      *
      * @param  ImageEntity $image
      * @return int The ID of the newly created image
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function create(ImageEntity $image): int
     {
@@ -125,7 +126,7 @@ class ImageRepository
      *
      * @param  ImageEntity $image
      * @return bool True in case of success, false if not.
-     * @throws Exception
+     * @throws DatabaseException
      */
     public function update(ImageEntity $image): bool
     {

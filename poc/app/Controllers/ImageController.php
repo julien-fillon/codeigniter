@@ -107,6 +107,39 @@ class ImageController extends BaseController
     }
 
     /**
+     * Upload a new image date.
+     *
+     * @return \CodeIgniter\HTTP\RedirectResponse
+     */
+    public function uploadImageDate(): RedirectResponse
+    {
+
+        $request = service('request');
+        $redirectUrl = $request->getServer('HTTP_REFERER');
+
+        $message = ['error', 'An error occurred when uploading the image !'];
+
+        if (!$this->validate(ImageValidator::rules())) {
+            return redirect()->back()->withInput()->with('error', implode(' ', $this->validator->getErrors()));
+        }
+
+        $file = $this->request->getFile('image');
+        $name = $this->request->getPost('name');
+        $category = ImageCategory::DATE->value;
+
+        try {
+            $message = $this->imageService->uploadImage($file, $name, $category) ?
+                ['success', 'Image uploaded successfully !'] :
+                ['error', 'An error occurred when uploading the image !'];
+        } catch (\Exception $e) {
+            $message = ['error', 'An error occurred when uploading the image : ' . $e->getMessage()];
+        }
+
+        return redirect()->TO($redirectUrl)->with($message[0], $message[1]);
+    }
+
+
+    /**
      * Complete edit form
      *
      * @param  string $id
